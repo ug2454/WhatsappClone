@@ -3,11 +3,12 @@ package com.example.whatsappclone;
 public class MyListData {
 
     private String userName;
+    private String uid;
 
 
-    public MyListData(String userName) {
+    public MyListData(String userName, String uid) {
         this.userName = userName;
-
+        this.uid = uid;
 
     }
 
@@ -20,4 +21,11 @@ public class MyListData {
     }
 
 
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
 }

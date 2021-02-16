@@ -38,7 +38,8 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
         holder.relativeLayout.setOnClickListener(view -> {
             Intent intent = new Intent(context, ChatActivity.class);
-            intent.putExtra("data",myListData.getUserName());
+            intent.putExtra("email", myListData.getUserName());
+            intent.putExtra("uid", myListData.getUid());
             context.startActivity(intent);
 
         });

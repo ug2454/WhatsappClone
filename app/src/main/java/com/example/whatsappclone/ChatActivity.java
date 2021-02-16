@@ -12,17 +12,29 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toolbar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NavUtils;
 
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -30,14 +42,13 @@ public class ChatActivity extends AppCompatActivity {
     EditText sendMessageEditText;
     ArrayList<String> messages = new ArrayList<>();
     ListView listView;
-    String usernameReceiver = "";
+    String emailReceiver = "";
+    String uid = "";
     ArrayAdapter adapter;
+    ConstraintLayout constraintLayout;
+    Date currentTime = Calendar.getInstance().getTime();
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        messages.clear();
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -45,73 +56,100 @@ public class ChatActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
         sendMessageEditText = findViewById(R.id.sendMessageEditText);
         listView = findViewById(R.id.chatListView);
 
+//        constraintLayout=findViewById(R.id.parent);
+//        listView.setOnClickListener((View.OnClickListener) this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        usernameReceiver = intent.getStringExtra("data");
-        setTitle(usernameReceiver);
+        emailReceiver = intent.getStringExtra("email");
+        uid = intent.getStringExtra("uid");
+        setTitle(emailReceiver);
         centerTitle();
 
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, messages);
 
         listView.setAdapter(adapter);
-        ParseQuery<ParseObject> query1 = new ParseQuery<ParseObject>("Message");
-        query1.whereEqualTo("sender", ParseUser.getCurrentUser().getUsername());
-        query1.whereEqualTo("recipient", usernameReceiver);
 
-        ParseQuery<ParseObject> query2 = new ParseQuery<ParseObject>("Message");
+//        db.collection("message").document(uid).collection(uid + emailReceiver).orderBy("timestamp")
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//
+//                    @Override
+//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            for (QueryDocumentSnapshot document : task.getResult()) {
+//                                Log.d(TAG, document.getId() + " => " + document.getData());
+////
+//
+//                            }
+//
+//
+//
+//                        }
+//                    }
+//                });
 
-        query1.whereEqualTo("sender", usernameReceiver);
-        query1.whereEqualTo("recipient", ParseUser.getCurrentUser().getUsername());
 
-        List<ParseQuery<ParseObject>> queries = new ArrayList<>();
-        queries.add(query1);
-        queries.add(query2);
-
-        ParseQuery<ParseObject> query = ParseQuery.or(queries);
-
-        query.orderByAscending("createdAt");
-
-        query.findInBackground((objects, e) -> {
-            if (e == null) {
-                if (objects.size() > 0) {
-                    System.out.println("ARRAY"+objects.toString());
-                    messages.clear();
-                    for (ParseObject message : objects) {
-                        String messageContent = message.getString("message");
-
-                        if (!message.getString("sender").equals(ParseUser.getCurrentUser().getUsername())) {
-                            messageContent = "> " + messageContent;
+        db.collection("message").document(uid).collection(uid + emailReceiver)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
                         }
-                        messages.add(messageContent);
 
+                        messages.clear();
+                        for (QueryDocumentSnapshot doc : value) {
+                            String messageContent = doc.getString("message");
+                            if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(doc.getString("uid"))) {
+                                messageContent = "> " + messageContent;
+
+                            }
+
+                            messages.add(messageContent);
+
+                        }
+                        adapter.notifyDataSetChanged();
 
                     }
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
+                });
 
 
     }
 
-    public void sendMessage(View view) {
-        ParseObject message = new ParseObject("Message");
-        message.put("sender", ParseUser.getCurrentUser().getUsername());
-        message.put("recipient", usernameReceiver);
-        message.put("message", sendMessageEditText.getText().toString());
 
-        message.saveInBackground(e -> {
-            if (e == null) {
-                Log.i(TAG, "sendMessage: SAVED ");
-                messages.add(sendMessageEditText.getText().toString());
-                adapter.notifyDataSetChanged();
-            }
-        });
+    public void sendMessage(View view) {
+
+        Map<String, Object> messageDetails = new HashMap<>();
+        messageDetails.put("message", sendMessageEditText.getText().toString());
+        messageDetails.put("senderId", uid);
+        messageDetails.put("timestamp", currentTime);
+
+        db.collection("message").document(uid).collection(uid + emailReceiver).document()
+                .set(messageDetails)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully written!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error writing document", e);
+                    }
+                });
+
+
+        sendMessageEditText.setText("");
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -142,6 +180,7 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -152,4 +191,11 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
+//    @Override
+//    public void onClick(View view) {
+//        if(view.getId()==R.id.chatListView){
+//            InputMethodManager inm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+//            inm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+//        }
+//    }
 }

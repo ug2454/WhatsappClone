@@ -7,22 +7,30 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-import static com.parse.ParseUser.logOut;
+import static com.example.whatsappclone.MainActivity.currentUserId;
 
 public class UserListActivity extends AppCompatActivity {
 
-    ArrayList<MyListData> userArrayList = new ArrayList<>();
+    static ArrayList<MyListData> userArrayList = new ArrayList<>();
+    static ArrayList<String> userId = new ArrayList();
 
     private static final String TAG = "INFO";
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -38,12 +46,15 @@ public class UserListActivity extends AppCompatActivity {
         // Handle item selection
         if (item.getItemId() == R.id.logout) {
             logOut();
-            Intent intent = new Intent(this, MainActivity.class);
-            finish();
-            startActivity(intent);
-
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void logOut() {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(this, MainActivity.class);
+        finish();
+        startActivity(intent);
     }
 
 
@@ -51,22 +62,33 @@ public class UserListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.whereNotEqualTo("username", ParseUser.getCurrentUser().getUsername());
-        query.findInBackground((objects, e) -> {
-            if (e == null && objects.size() > 0) {
-                for (int i = 0; i < objects.size(); i++) {
-                    userArrayList.add(new MyListData(objects.get(i).getUsername()));
-                    Log.i(TAG, "onCreate: " + objects.get(i).getUsername());
+        setTitle("WhatsApp");
+        Log.i(TAG, "onCreate: " + currentUserId);
+        db.collection("users")
+                .whereNotEqualTo("uid", FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
-                }
-                RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
-                MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
-                recyclerView.setHasFixedSize(true);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                recyclerView.setAdapter(myListAdapter);
-            }
-        });
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                userArrayList.add(new MyListData(document.getString("email"),document.getString("uid")));
+
+                            }
+                            Log.i(TAG, "onCreate: " + userArrayList.toString());
+
+                            RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
+                            MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
+                            recyclerView.setHasFixedSize(true);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                            recyclerView.setAdapter(myListAdapter);
+
+
+                        }
+                    }
+                });
 
 
     }
