@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -43,12 +44,12 @@ public class ChatActivity extends AppCompatActivity {
     ArrayList<String> messages = new ArrayList<>();
     ListView listView;
     String emailReceiver = "";
-    String uid = "";
+    String receiverUid = "";
     ArrayAdapter adapter;
     ConstraintLayout constraintLayout;
     Date currentTime = Calendar.getInstance().getTime();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+    int messageCount = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -67,7 +68,7 @@ public class ChatActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         emailReceiver = intent.getStringExtra("email");
-        uid = intent.getStringExtra("uid");
+        receiverUid = intent.getStringExtra("uid");
         setTitle(emailReceiver);
         centerTitle();
 
@@ -75,27 +76,11 @@ public class ChatActivity extends AppCompatActivity {
 
         listView.setAdapter(adapter);
 
-//        db.collection("message").document(uid).collection(uid + emailReceiver).orderBy("timestamp")
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                                Log.d(TAG, document.getId() + " => " + document.getData());
-////
-//
-//                            }
-//
-//
-//
-//                        }
-//                    }
-//                });
 
-
-        db.collection("message").document(uid).collection(uid + emailReceiver)
+        db.collection("message")
+                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .collection(receiverUid)
+                .orderBy("messageCount", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value,
@@ -108,7 +93,7 @@ public class ChatActivity extends AppCompatActivity {
                         messages.clear();
                         for (QueryDocumentSnapshot doc : value) {
                             String messageContent = doc.getString("message");
-                            if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(doc.getString("uid"))) {
+                            if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(doc.getString("uid"))) {
                                 messageContent = "> " + messageContent;
 
                             }
@@ -129,10 +114,28 @@ public class ChatActivity extends AppCompatActivity {
 
         Map<String, Object> messageDetails = new HashMap<>();
         messageDetails.put("message", sendMessageEditText.getText().toString());
-        messageDetails.put("senderId", uid);
+        messageDetails.put("senderId", receiverUid);
         messageDetails.put("timestamp", currentTime);
+        messageDetails.put("messageCount", messageCount);
 
-        db.collection("message").document(uid).collection(uid + emailReceiver).document()
+
+        db.collection("message").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection(receiverUid).document()
+                .set(messageDetails)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully written!");
+                        messageCount++;
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error writing document", e);
+                    }
+                });
+
+        db.collection("message").document(receiverUid).collection(FirebaseAuth.getInstance().getCurrentUser().getUid()).document()
                 .set(messageDetails)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

@@ -64,6 +64,7 @@ public class UserListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_list);
         setTitle("WhatsApp");
         Log.i(TAG, "onCreate: " + currentUserId);
+        userArrayList.clear();
         db.collection("users")
                 .whereNotEqualTo("uid", FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .get()
