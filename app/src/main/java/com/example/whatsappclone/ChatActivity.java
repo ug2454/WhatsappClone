@@ -20,8 +20,10 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NavUtils;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,7 +51,8 @@ public class ChatActivity extends AppCompatActivity {
     ConstraintLayout constraintLayout;
     Date currentTime = Calendar.getInstance().getTime();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    int messageCount = 0;
+    long messageCountSender;
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -72,6 +75,27 @@ public class ChatActivity extends AppCompatActivity {
         setTitle(emailReceiver);
         centerTitle();
 
+
+
+
+        db.collection("messageCount")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                messageCountSender = (long) document.get("messageCount");
+
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, messages);
 
         listView.setAdapter(adapter);
@@ -93,12 +117,17 @@ public class ChatActivity extends AppCompatActivity {
                         messages.clear();
                         for (QueryDocumentSnapshot doc : value) {
                             String messageContent = doc.getString("message");
-                            if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(doc.getString("uid"))) {
-                                messageContent = "> " + messageContent;
+                            String userType = doc.getString("userType");
 
+                            assert userType != null;
+                            if (userType.equals("receiver")) {
+                                messageContent = emailReceiver + " > " + messageContent;
+
+                            } else {
+                                messageContent = doc.getString("email") + " > " + messageContent;
                             }
-
                             messages.add(messageContent);
+
 
                         }
                         adapter.notifyDataSetChanged();
@@ -112,46 +141,103 @@ public class ChatActivity extends AppCompatActivity {
 
     public void sendMessage(View view) {
 
-        Map<String, Object> messageDetails = new HashMap<>();
-        messageDetails.put("message", sendMessageEditText.getText().toString());
-        messageDetails.put("senderId", receiverUid);
-        messageDetails.put("timestamp", currentTime);
-        messageDetails.put("messageCount", messageCount);
+        db.collection("messageCount")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                messageCountSender = (long) document.get("messageCount");
+
+                            }
+                            Map<String, Object> messageDetails = new HashMap<>();
+                            messageDetails.put("message", sendMessageEditText.getText().toString());
+                            messageDetails.put("senderId", receiverUid);
+                            messageDetails.put("timestamp", currentTime);
+                            messageDetails.put("messageCount", messageCountSender);
+                            messageDetails.put("userType", "sender");
+                            messageDetails.put("email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
 
 
-        db.collection("message").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection(receiverUid).document()
-                .set(messageDetails)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully written!");
-                        messageCount++;
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error writing document", e);
+                            db.collection("message").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection(receiverUid).document()
+                                    .set(messageDetails)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "DocumentSnapshot successfully written!");
+                                            db.collection("messageCount").document("message")
+                                                    .update("messageCount", messageCountSender+1)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w(TAG, "Error updating document", e);
+                                                        }
+                                                    });
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error writing document", e);
+                                        }
+                                    });
+
+                            Map<String, Object> messageDetails1 = new HashMap<>();
+                            messageDetails1.put("message", sendMessageEditText.getText().toString());
+                            messageDetails1.put("senderId", receiverUid);
+                            messageDetails1.put("timestamp", currentTime);
+                            messageDetails1.put("messageCount", messageCountSender);
+                            messageDetails1.put("userType", "receiver");
+                            messageDetails1.put("email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+
+                            db.collection("message").document(receiverUid).collection(FirebaseAuth.getInstance().getCurrentUser().getUid()).document()
+                                    .set(messageDetails1)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d(TAG, "DocumentSnapshot successfully written!");
+                                            db.collection("messageCount").document("message")
+                                                    .update("messageCount", messageCountSender+1)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w(TAG, "Error updating document", e);
+                                                        }
+                                                    });
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error writing document", e);
+                                        }
+                                    });
+
+
+                            sendMessageEditText.setText("");
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
                     }
                 });
 
-        db.collection("message").document(receiverUid).collection(FirebaseAuth.getInstance().getCurrentUser().getUid()).document()
-                .set(messageDetails)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "DocumentSnapshot successfully written!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error writing document", e);
-                    }
-                });
 
 
-        sendMessageEditText.setText("");
+
 
     }
 
