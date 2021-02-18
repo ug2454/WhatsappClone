@@ -14,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.type.Color;
+
 import java.util.ArrayList;
 
 
@@ -37,9 +39,12 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final MyListData myListData = listData.get(position);
         Context context = holder.itemView.getContext();
+
         holder.itemView.setPadding(50,20,0,20);
-        holder.textView.setTextSize(20);
-        holder.textView.setTypeface(Typeface.DEFAULT_BOLD);
+        holder.itemView.setBackgroundColor(0xFF172228);
+        holder.textView.setTextSize(15);
+        holder.textView.setTextColor(0xFFFFFFFF);
+        holder.textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
         holder.textView.setText(listData.get(position).getUserName().toUpperCase());
 
@@ -51,6 +56,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
         });
     }
+
 
 
 

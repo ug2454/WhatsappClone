@@ -9,6 +9,8 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -46,6 +48,8 @@ public class UserListActivity extends AppCompatActivity {
         // Handle item selection
         if (item.getItemId() == R.id.logout) {
             logOut();
+        } else if (item.getItemId() == R.id.refresh) {
+            refresh();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -57,6 +61,10 @@ public class UserListActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void refresh() {
+        finish();
+        startActivity(getIntent());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +72,7 @@ public class UserListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_list);
         setTitle("WhatsApp");
         Log.i(TAG, "onCreate: " + currentUserId);
+        System.out.println("REFRESH");
         userArrayList.clear();
         db.collection("users")
                 .whereNotEqualTo("uid", FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -75,13 +84,16 @@ public class UserListActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                userArrayList.add(new MyListData(document.getString("nickname"),document.getString("uid")));
+                                userArrayList.add(new MyListData(document.getString("nickname"), document.getString("uid")));
 
                             }
                             Log.i(TAG, "onCreate: " + userArrayList.toString());
 
                             RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
                             MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
+                            DividerItemDecoration itemDecor = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
+                            itemDecor.setDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.divider));
+                            recyclerView.addItemDecoration(itemDecor);
                             recyclerView.setHasFixedSize(true);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                             recyclerView.setAdapter(myListAdapter);
