@@ -2,6 +2,9 @@ package com.example.whatsappclone;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.fonts.Font;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,16 +37,22 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final MyListData myListData = listData.get(position);
         Context context = holder.itemView.getContext();
-        holder.textView.setText(listData.get(position).getUserName());
+        holder.itemView.setPadding(50,20,0,20);
+        holder.textView.setTextSize(20);
+        holder.textView.setTypeface(Typeface.DEFAULT_BOLD);
+
+        holder.textView.setText(listData.get(position).getUserName().toUpperCase());
 
         holder.relativeLayout.setOnClickListener(view -> {
             Intent intent = new Intent(context, ChatActivity.class);
-            intent.putExtra("email", myListData.getUserName());
+            intent.putExtra("nickname", myListData.getUserName());
             intent.putExtra("uid", myListData.getUid());
             context.startActivity(intent);
 
         });
     }
+
+
 
     @Override
     public int getItemCount() {

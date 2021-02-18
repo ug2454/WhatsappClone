@@ -52,7 +52,7 @@ public class UserListActivity extends AppCompatActivity {
 
     private void logOut() {
         FirebaseAuth.getInstance().signOut();
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         finish();
         startActivity(intent);
     }
@@ -75,7 +75,7 @@ public class UserListActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                userArrayList.add(new MyListData(document.getString("email"),document.getString("uid")));
+                                userArrayList.add(new MyListData(document.getString("nickname"),document.getString("uid")));
 
                             }
                             Log.i(TAG, "onCreate: " + userArrayList.toString());
