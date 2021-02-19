@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeightLarge"
     android:background="@drawable/border">
 
 
+    <ImageView
+        android:id="@+id/userImage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+
+        android:layout_marginTop="14dp"
+
+        android:scaleType="centerCrop"
+        android:src="@drawable/blankimage" />
+
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
 
+        android:layout_toEndOf="@id/userImage"
+        android:layout_toRightOf="@id/userImage"
         android:gravity="center_vertical"
+        android:paddingLeft="20dp"
         android:text="@string/textview"
         android:textSize="16sp" />
 

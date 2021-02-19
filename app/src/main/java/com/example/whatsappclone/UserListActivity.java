@@ -50,8 +50,15 @@ public class UserListActivity extends AppCompatActivity {
             logOut();
         } else if (item.getItemId() == R.id.refresh) {
             refresh();
+        }else if (item.getItemId() == R.id.profile) {
+            openProfile();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openProfile() {
+        Intent intent = new Intent(this,ProfileActivity.class);
+        startActivity(intent);
     }
 
     private void logOut() {
@@ -91,9 +98,9 @@ public class UserListActivity extends AppCompatActivity {
 
                             RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
                             MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
-                            DividerItemDecoration itemDecor = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
-                            itemDecor.setDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.divider));
-                            recyclerView.addItemDecoration(itemDecor);
+//                            DividerItemDecoration itemDecor = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
+//                            itemDecor.setDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.divider));
+//                            recyclerView.addItemDecoration(itemDecor);
                             recyclerView.setHasFixedSize(true);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                             recyclerView.setAdapter(myListAdapter);
