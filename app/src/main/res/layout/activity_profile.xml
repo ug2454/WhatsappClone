@@ -7,6 +7,21 @@
     android:background="#172228"
     tools:context=".ProfileActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:outlineAmbientShadowColor="@color/white"
+        android:outlineSpotShadowColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.36" />
+
     <RelativeLayout
         android:id="@+id/shape_layout"
         android:layout_width="200dp"
@@ -49,6 +64,7 @@
         android:layout_marginEnd="55dp"
         android:layout_marginRight="55dp"
         android:background="#172228"
+        android:onClick="selectImage"
         app:backgroundTint="#172228"
         app:icon="@android:drawable/ic_menu_camera"
         app:iconGravity="start"
@@ -60,31 +76,38 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="80dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/shape_layout">
 
 
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:text="Nickname" />
 
-            <EditText
-                android:id="@+id/nicknameEditText"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="40dp"
-                android:paddingStart="5dp"
-                android:paddingEnd="0dp"
-                android:layout_marginTop="35dp"
-                android:layout_marginRight="40dp"
-                android:background="#e8e8e8"
-                android:ems="10"
+        <EditText
+            android:id="@+id/nicknameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="40dp"
 
-                android:inputType="text"
-                android:paddingLeft="20dp"
-                android:paddingRight="0dp" />
+            android:layout_marginRight="40dp"
+            android:background="#e8e8e8"
+            android:ems="10"
+            android:inputType="text"
+            android:paddingStart="5dp"
 
+            android:paddingLeft="20dp"
+            android:paddingEnd="0dp"
+            android:paddingRight="0dp" />
 
 
     </LinearLayout>
@@ -94,8 +117,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#172228"
-        android:textSize="15sp"
+        android:onClick="save"
         android:text="Save"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

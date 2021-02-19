@@ -1,26 +1,141 @@
 package com.example.whatsappclone;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.util.UUID;
+
 public class ProfileActivity extends AppCompatActivity {
+    Uri uri1;
+    Bitmap bitmap;
+    String imageName;
+    ImageView roundedImage;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private static final String TAG = "INFO";
+    ProgressBar progressBar;
+    EditText nickname;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        imageName = UUID.randomUUID().toString() + ".jpg";
         setContentView(R.layout.activity_profile);
         setTitle("Profile");
+        progressBar = findViewById(R.id.progressBar1);
+        nickname = findViewById(R.id.nicknameEditText);
+        roundedImage = findViewById(R.id.roundedimage);
+        progressBar.setVisibility(View.VISIBLE);
+        db.collection("users").whereEqualTo("uid", FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                nickname.setText(document.getString("nickname"));
+                                if (document.get("imageUrl") != null) {
+                                    String url = (String) document.get("imageUrl");
+                                    Picasso.with(getApplicationContext())
+                                            .load(url)
+                                            .into(roundedImage);
+                                } else {
+                                    roundedImage.setImageResource(R.drawable.blankimage);
+                                    roundedImage.setBackgroundColor(0xFF172228);
+                                }
 
-        ImageView roundedImage = findViewById(R.id.roundedimage);
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+        progressBar.setVisibility(View.GONE);
 
-        Picasso.with(getApplicationContext())
-                .load("https://firebasestorage.googleapis.com/v0/b/whatsapp-722cb.appspot.com/o/me.jpg?alt=media&token=ce0a2a36-dc7a-48b5-a65a-83023efbea39")
-                .into(roundedImage);
 
+    }
+
+    public static final int PICK_IMAGE = 1;
+
+    public void selectImage(View view) {
+
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            roundedImage = findViewById(R.id.roundedimage);
+
+            progressBar.setVisibility(View.VISIBLE);
+
+            assert data != null;
+            uri1 = data.getData();
+            System.out.println(uri1.toString());
+            bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri1);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+            byte[] byteData = baos.toByteArray();
+
+            FirebaseStorage.getInstance().getReference().child("images").child(imageName).putBytes(byteData).addOnFailureListener(e -> {
+                Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+            }).addOnSuccessListener(taskSnapshot -> {
+
+                Toast.makeText(this, "Image uploaded", Toast.LENGTH_LONG).show();
+
+                FirebaseStorage.getInstance().getReference().child("images").child(imageName).getDownloadUrl().addOnSuccessListener(uri -> {
+                    String url = uri.toString();
+                    System.out.println(url);
+                    db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).update("imageUrl", url);
+                    Picasso.with(getApplicationContext())
+                            .load(url)
+                            .into(roundedImage);
+
+                });
+            });
+            progressBar.setVisibility(View.GONE);
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+
+    }
+
+    public void save(View view) {
+        db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).update("nickname", nickname.getText().toString()).addOnSuccessListener(aVoid -> {
+            Toast.makeText(this, "Details Saved", Toast.LENGTH_LONG).show();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Save Failed", Toast.LENGTH_LONG).show();
+        });
 
 
     }
