@@ -9,8 +9,6 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,7 +26,8 @@ import static com.example.whatsappclone.MainActivity.currentUserId;
 public class UserListActivity extends AppCompatActivity {
 
     static ArrayList<MyListData> userArrayList = new ArrayList<>();
-    static ArrayList<String> userId = new ArrayList();
+    static ArrayList<MyListData> userList = new ArrayList<>();
+    String uid = "";
 
     private static final String TAG = "INFO";
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -50,14 +49,14 @@ public class UserListActivity extends AppCompatActivity {
             logOut();
         } else if (item.getItemId() == R.id.refresh) {
             refresh();
-        }else if (item.getItemId() == R.id.profile) {
+        } else if (item.getItemId() == R.id.profile) {
             openProfile();
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void openProfile() {
-        Intent intent = new Intent(this,ProfileActivity.class);
+        Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 
@@ -77,12 +76,18 @@ public class UserListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         setTitle("WhatsApp");
         Log.i(TAG, "onCreate: " + currentUserId);
+
         System.out.println("REFRESH");
+
+
         userArrayList.clear();
+
+
         db.collection("users")
-                .whereNotEqualTo("uid", FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .whereNotEqualTo("uid", uid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
 
@@ -91,7 +96,7 @@ public class UserListActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                userArrayList.add(new MyListData(document.getString("nickname"), document.getString("uid")));
+                                userArrayList.add(new MyListData(document.getString("nickname"), document.getString("uid"), document.getString("imageUrl")));
 
                             }
                             Log.i(TAG, "onCreate: " + userArrayList.toString());

@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -53,7 +54,8 @@ public class ChatActivity extends AppCompatActivity {
     Date currentTime = Calendar.getInstance().getTime();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     long messageCountSender;
-
+    String uid = "";
+    String emailFirebaseAuth="";
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -61,7 +63,9 @@ public class ChatActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        uid=user.getUid();
+        emailFirebaseAuth=user.getEmail();
         sendMessageEditText = findViewById(R.id.sendMessageEditText);
         listView = findViewById(R.id.chatListView);
 
@@ -94,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 });
 
-        db.collection("users").whereEqualTo("uid", FirebaseAuth.getInstance().getCurrentUser().getUid())
+        db.collection("users").whereEqualTo("uid", uid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -118,7 +122,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
         db.collection("message")
-                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .document(uid)
                 .collection(receiverUid)
                 .orderBy("messageCount", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -174,11 +178,11 @@ public class ChatActivity extends AppCompatActivity {
                                 messageDetails.put("timestamp", currentTime);
                                 messageDetails.put("messageCount", messageCountSender);
                                 messageDetails.put("userType", "sender");
-                                messageDetails.put("email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                                messageDetails.put("email", emailFirebaseAuth);
                                 messageDetails.put("nickname", nicknameCurrentUser);
 
 
-                                db.collection("message").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection(receiverUid).document()
+                                db.collection("message").document(uid).collection(receiverUid).document()
                                         .set(messageDetails)
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
@@ -213,10 +217,10 @@ public class ChatActivity extends AppCompatActivity {
                                 messageDetails1.put("timestamp", currentTime);
                                 messageDetails1.put("messageCount", messageCountSender);
                                 messageDetails1.put("userType", "receiver");
-                                messageDetails1.put("email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                                messageDetails1.put("email", emailFirebaseAuth);
                                 messageDetails.put("nickname", nicknameCurrentUser);
 
-                                db.collection("message").document(receiverUid).collection(FirebaseAuth.getInstance().getCurrentUser().getUid()).document()
+                                db.collection("message").document(receiverUid).collection(uid).document()
                                         .set(messageDetails1)
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override

@@ -20,7 +20,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
@@ -118,7 +117,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         userDetails.put("uid", currentUserId);
         userDetails.put("email", email.getText().toString());
         userDetails.put("timestamp", currentTime);
-        userDetails.put("nickname",nickName.getText().toString());
+        userDetails.put("nickname", nickName.getText().toString());
+        userDetails.put("imageUrl", "");
 
         db.collection("users").document(currentUserId).set(userDetails)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
@@ -127,8 +127,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void clickLogin(View view) {
-       Intent intent = new Intent(this,LoginActivity.class);
-       startActivity(intent);
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
 
     }
 

@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -35,21 +35,21 @@ public class ProfileActivity extends AppCompatActivity {
     ImageView roundedImage;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "INFO";
-    ProgressBar progressBar;
     EditText nickname;
 
-
+    String uid="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         imageName = UUID.randomUUID().toString() + ".jpg";
         setContentView(R.layout.activity_profile);
+        uid=FirebaseAuth.getInstance().getCurrentUser().getUid();
         setTitle("Profile");
-        progressBar = findViewById(R.id.progressBar1);
+
         nickname = findViewById(R.id.nicknameEditText);
         roundedImage = findViewById(R.id.roundedimage);
-        progressBar.setVisibility(View.VISIBLE);
-        db.collection("users").whereEqualTo("uid", FirebaseAuth.getInstance().getCurrentUser().getUid())
+
+        db.collection("users").whereEqualTo("uid", uid)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -62,6 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     String url = (String) document.get("imageUrl");
                                     Picasso.with(getApplicationContext())
                                             .load(url)
+                                            .networkPolicy(NetworkPolicy.OFFLINE)
                                             .into(roundedImage);
                                 } else {
                                     roundedImage.setImageResource(R.drawable.blankimage);
@@ -74,7 +75,6 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     }
                 });
-        progressBar.setVisibility(View.GONE);
 
 
     }
@@ -95,7 +95,6 @@ public class ProfileActivity extends AppCompatActivity {
         try {
             roundedImage = findViewById(R.id.roundedimage);
 
-            progressBar.setVisibility(View.VISIBLE);
 
             assert data != null;
             uri1 = data.getData();
@@ -114,14 +113,14 @@ public class ProfileActivity extends AppCompatActivity {
                 FirebaseStorage.getInstance().getReference().child("images").child(imageName).getDownloadUrl().addOnSuccessListener(uri -> {
                     String url = uri.toString();
                     System.out.println(url);
-                    db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).update("imageUrl", url);
+                    db.collection("users").document(uid).update("imageUrl", url);
                     Picasso.with(getApplicationContext())
                             .load(url)
+                            .networkPolicy(NetworkPolicy.OFFLINE)
                             .into(roundedImage);
 
                 });
             });
-            progressBar.setVisibility(View.GONE);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -131,7 +130,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     public void save(View view) {
-        db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).update("nickname", nickname.getText().toString()).addOnSuccessListener(aVoid -> {
+        db.collection("users").document(uid).update("nickname", nickname.getText().toString()).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Details Saved", Toast.LENGTH_LONG).show();
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Save Failed", Toast.LENGTH_LONG).show();
