@@ -5,6 +5,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#172228"
     tools:context=".ChatActivity">
 
     <EditText
@@ -19,6 +20,8 @@
         android:background="@drawable/rounded_edittext"
         android:ems="10"
         android:hint="Type a message"
+        android:textColor="#ffffff"
+        android:textColorHint="#ffffff"
         android:inputType="textPersonName"
         android:paddingLeft="10dp"
         app:boxBackgroundMode="none"
@@ -30,6 +33,9 @@
         android:id="@+id/chatListView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="#FFFFFF"
+        android:backgroundTint="#172228"
+        android:divider="@null"
         android:stackFromBottom="true"
         android:transcriptMode="alwaysScroll"
         app:layout_constraintBottom_toTopOf="@+id/sendMessageEditText"

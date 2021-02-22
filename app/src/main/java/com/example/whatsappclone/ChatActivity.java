@@ -20,6 +20,8 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NavUtils;
 
+import com.example.whatsappclone.adapters.ChatListAdapter;
+import com.example.whatsappclone.models.ChatListData;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -44,11 +46,12 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final String TAG = "INFO";
     EditText sendMessageEditText;
-    ArrayList<String> messages = new ArrayList<>();
+    ArrayList<ChatListData> messages = new ArrayList<>();
     ListView listView;
     String nickname = "";
     String receiverUid = "";
     ArrayAdapter adapter;
+
     String nicknameCurrentUser = "";
     ConstraintLayout constraintLayout;
     Date currentTime = Calendar.getInstance().getTime();
@@ -116,9 +119,10 @@ public class ChatActivity extends AppCompatActivity {
                 });
 
 
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, messages);
+//        adapter = new ArrayAdapter(this, R.layout.chat_item, messages);
 
-        listView.setAdapter(adapter);
+//        CustomAdapter customAdapter = new Custom
+
 
 
         db.collection("message")
@@ -141,16 +145,20 @@ public class ChatActivity extends AppCompatActivity {
 
                             assert userType != null;
                             if (userType.equals("receiver")) {
-                                messageContent = nickname + " > " + messageContent;
+//                                messageContent = nickname + " > " + messageContent;
+                                messages.add(new ChatListData(nickname,messageContent));
 
                             } else {
-                                messageContent = doc.getString("nickname") + " > " + messageContent;
+
+                                messages.add(new ChatListData(doc.getString("nickname"),messageContent));
                             }
-                            messages.add(messageContent);
+
 
 
                         }
-                        adapter.notifyDataSetChanged();
+                        ChatListAdapter chatListAdapter = new ChatListAdapter(getApplicationContext(),messages);
+                        listView.setAdapter(chatListAdapter);
+//                        adapter.notifyDataSetChanged();
 
                     }
                 });

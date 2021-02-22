@@ -1,4 +1,4 @@
-package com.example.whatsappclone;
+package com.example.whatsappclone.models;
 
 public class MyListData {
 

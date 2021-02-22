@@ -1,11 +1,8 @@
-package com.example.whatsappclone;
+package com.example.whatsappclone.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.fonts.Font;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +13,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.whatsappclone.ChatActivity;
+import com.example.whatsappclone.R;
+import com.example.whatsappclone.models.MyListData;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.type.Color;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
@@ -44,6 +39,8 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
         return new ViewHolder(listItem);
     }
+
+
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
