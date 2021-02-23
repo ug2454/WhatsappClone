@@ -62,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     String url = (String) document.get("imageUrl");
                                     Picasso.with(getApplicationContext())
                                             .load(url)
-                                            .networkPolicy(NetworkPolicy.OFFLINE)
+
                                             .into(roundedImage);
                                 } else {
                                     roundedImage.setImageResource(R.drawable.blankimage);
@@ -116,7 +116,7 @@ public class ProfileActivity extends AppCompatActivity {
                     db.collection("users").document(uid).update("imageUrl", url);
                     Picasso.with(getApplicationContext())
                             .load(url)
-                            .networkPolicy(NetworkPolicy.OFFLINE)
+
                             .into(roundedImage);
 
                 });

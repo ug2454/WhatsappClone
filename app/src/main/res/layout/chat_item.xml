@@ -8,12 +8,12 @@
     android:orientation="vertical">
 
     <TextView
-        android:paddingTop="10dp"
         android:id="@+id/nameTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingLeft="10dp"
+        android:paddingLeft="30dp"
+        android:paddingTop="10dp"
 
         android:text="TextView"
         android:textColor="#FFFFFF"
@@ -22,13 +22,23 @@
 
     <TextView
         android:id="@+id/messageTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingLeft="10dp"
-android:paddingBottom="5dp"
+        android:paddingLeft="30dp"
+        android:paddingBottom="5dp"
         android:text="TextView"
         android:textColor="#CACACA"
         android:textSize="15dp" />
+    <TextView
+        android:id="@+id/timestampTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="30dp"
+        android:paddingBottom="5dp"
+        android:text="TextView"
+        android:textColor="#777777"
+        android:textSize="12dp" />
 </LinearLayout>
 

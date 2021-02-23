@@ -88,6 +88,12 @@ public class UserListActivity extends AppCompatActivity {
         userArrayList.clear();
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        userArrayList.clear();
+        super.onResume();
         db.collection("users")
                 .whereNotEqualTo("uid", uid)
                 .get()
@@ -98,16 +104,14 @@ public class UserListActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
-                                userArrayList.add(new MyListData(document.getString("nickname"), document.getString("uid"), document.getString("imageUrl")));
+                                userArrayList.add(new MyListData(document.getString("nickname"), document.getString("uid"), document.getString("imageUrl"), document.getString("lastMessage")));
 
                             }
                             Log.i(TAG, "onCreate: " + userArrayList.toString());
 
                             RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
                             MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
-//                            DividerItemDecoration itemDecor = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
-//                            itemDecor.setDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.divider));
-//                            recyclerView.addItemDecoration(itemDecor);
+//
                             recyclerView.setHasFixedSize(true);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                             recyclerView.setAdapter(myListAdapter);
@@ -116,7 +120,5 @@ public class UserListActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
     }
 }

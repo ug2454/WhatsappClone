@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.EventListener;
@@ -35,6 +36,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -142,15 +144,15 @@ public class ChatActivity extends AppCompatActivity {
                         for (QueryDocumentSnapshot doc : value) {
                             String messageContent = doc.getString("message");
                             String userType = doc.getString("userType");
-
+                            Date timestamp= doc.getTimestamp("timestamp").toDate();
                             assert userType != null;
                             if (userType.equals("receiver")) {
 //                                messageContent = nickname + " > " + messageContent;
-                                messages.add(new ChatListData(nickname,messageContent));
+                                messages.add(new ChatListData(nickname,messageContent,userType, timestamp));
 
                             } else {
 
-                                messages.add(new ChatListData(doc.getString("nickname"),messageContent));
+                                messages.add(new ChatListData(doc.getString("nickname"),messageContent,userType, timestamp));
                             }
 
 
@@ -169,6 +171,11 @@ public class ChatActivity extends AppCompatActivity {
 
     public void sendMessage(View view) {
         if (!sendMessageEditText.getText().toString().isEmpty()) {
+            db.collection("users").document(receiverUid).update("lastMessage",sendMessageEditText.getText().toString()).addOnSuccessListener(aVoid -> {
+                Log.d(TAG, "DocumentSnapshot successfully updated!");
+            }).addOnFailureListener(e -> {
+                Log.d(TAG, "DocumentSnapshot failed to update!");
+            });
             db.collection("messageCount")
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

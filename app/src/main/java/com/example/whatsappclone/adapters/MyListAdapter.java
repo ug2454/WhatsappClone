@@ -17,7 +17,6 @@ import com.example.whatsappclone.ChatActivity;
 import com.example.whatsappclone.R;
 import com.example.whatsappclone.models.MyListData;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
     private final ArrayList<MyListData> listData;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "INFO";
+
     public MyListAdapter(ArrayList<MyListData> listData) {
         this.listData = listData;
     }
@@ -41,13 +41,12 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
     }
 
 
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final MyListData myListData = listData.get(position);
         Context context = holder.itemView.getContext();
 
-        holder.itemView.setPadding(50,20,0,20);
+        holder.itemView.setPadding(50, 20, 0, 20);
         holder.itemView.setBackgroundColor(0xFF172228);
         holder.textView.setTextSize(15);
 
@@ -55,17 +54,16 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         holder.textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
         holder.textView.setText(listData.get(position).getUserName().toUpperCase());
-
-        if(listData.get(position).getImageUrl().isEmpty()){
+        holder.lastMessageTextView.setText(listData.get(position).getLastMessage());
+        if (listData.get(position).getImageUrl().isEmpty()) {
             System.out.println("IN IF");
             holder.imageView.setImageResource(R.drawable.blankimage);
             holder.imageView.setBackgroundColor(0xFF172228);
-        }
-        else{
+        } else {
             System.out.println(listData.get(position).getImageUrl());
             Picasso.with(context.getApplicationContext())
                     .load(listData.get(position).getImageUrl())
-                    .networkPolicy(NetworkPolicy.OFFLINE)
+
                     .into(holder.imageView);
 
         }
@@ -79,8 +77,6 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
     }
 
 
-
-
     @Override
     public int getItemCount() {
         return listData.size();
@@ -91,12 +87,14 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         public TextView textView;
         public ImageView imageView;
         public RelativeLayout relativeLayout;
+        public TextView lastMessageTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             this.textView = itemView.findViewById(R.id.textView);
-            this.imageView=itemView.findViewById(R.id.userImage);
+            this.lastMessageTextView = itemView.findViewById(R.id.lastMessageTextView);
+            this.imageView = itemView.findViewById(R.id.userImage);
             relativeLayout = itemView.findViewById(R.id.relativeLayout);
         }
     }
