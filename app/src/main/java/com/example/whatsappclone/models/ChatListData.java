@@ -8,10 +8,10 @@ public class ChatListData {
     private String userType;
     private Date timestamp;
 
-    public ChatListData(String nickname, String message, String userType, Date timestamp){
-        this.message=message;
-        this.nickname=nickname;
-        this.userType=userType;
+    public ChatListData(String nickname, String message, String userType, Date timestamp) {
+        this.message = message;
+        this.nickname = nickname;
+        this.userType = userType;
         this.timestamp = timestamp;
     }
 

@@ -1,5 +1,6 @@
 package com.example.whatsappclone;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
-    private static final String TAG = "INFO";
+    private static final String TAG = MainActivity.class.getSimpleName();
 
 
     public void goToNext() {
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            currentUserId = user.getUid();
+                            currentUserId = Objects.requireNonNull(user).getUid();
                             Log.d(TAG, "clickSignup:" + currentUserId);
                             addNewUser();
                             goToNext();
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         userDetails.put("timestamp", currentTime);
         userDetails.put("nickname", nickName.getText().toString());
         userDetails.put("imageUrl", "");
-        userDetails.put("lastMessage","");
+        userDetails.put("lastMessage", "");
 
         db.collection("users").document(currentUserId).set(userDetails)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
@@ -210,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private class MyTextWatcher implements TextWatcher {
 
-        private View view;
+        private final View view;
 
         private MyTextWatcher(View view) {
             this.view = view;
@@ -222,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         }
 
+        @SuppressLint("NonConstantResourceId")
         public void afterTextChanged(Editable editable) {
             switch (view.getId()) {
                 case R.id.nickNameEditText:

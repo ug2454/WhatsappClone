@@ -1,5 +1,6 @@
 package com.example.whatsappclone.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.Build;
@@ -15,7 +16,6 @@ import com.example.whatsappclone.R;
 import com.example.whatsappclone.models.ChatListData;
 
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -70,6 +70,7 @@ public class ChatListAdapter implements ListAdapter {
         return false;
     }
 
+    @SuppressLint("InflateParams")
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
@@ -82,9 +83,9 @@ public class ChatListAdapter implements ListAdapter {
                 TextView message = view.findViewById(R.id.messageTextView);
                 TextView timestampTextView = view.findViewById(R.id.timestampTextView);
 
-                SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+                @SuppressLint("SimpleDateFormat") SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
-                String date=sfd.format(new Date(String.valueOf(chatListData.getTimestamp())));
+                String date = sfd.format(new Date(String.valueOf(chatListData.getTimestamp())));
                 timestampTextView.setText(date);
                 name.setText(chatListData.getNickname());
                 message.setText(chatListData.getMessage());

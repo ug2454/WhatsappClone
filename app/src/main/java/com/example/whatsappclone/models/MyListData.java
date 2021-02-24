@@ -11,7 +11,7 @@ public class MyListData {
     public MyListData(String userName, String uid, String imageUrl, String lastMessage) {
         this.userName = userName;
         this.uid = uid;
-        this.imageUrl=imageUrl;
+        this.imageUrl = imageUrl;
 
         this.lastMessage = lastMessage;
     }

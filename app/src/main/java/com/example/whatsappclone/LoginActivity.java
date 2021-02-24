@@ -1,5 +1,6 @@
 package com.example.whatsappclone;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,28 +16,25 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Objects;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     EditText email;
     EditText password;
     EditText nickName;
     Button signUpButton;
     Button loginButton;
-    static FirebaseUser currentUser;
     FirebaseAuth mAuth;
     static String currentUserId;
     TextInputLayout emailTextInputLayout, passwordTextInputLayout, nickNameTextInputLayout;
 
-    private static final String TAG = "INFO";
+    private static final String TAG = LoginActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,10 +48,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         emailTextInputLayout = findViewById(R.id.input_layout_email);
         passwordTextInputLayout = findViewById(R.id.input_layout_password);
         nickNameTextInputLayout = findViewById(R.id.input_layout_name);
-//        ConstraintLayout constraintLayout = findViewById(R.id.constraintLayout1);
-//        constraintLayout.setOnClickListener((View.OnClickListener) getApplicationContext());
     }
-
 
 
     public void clickLogin(View view) {
@@ -64,7 +59,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success");
                         FirebaseUser user = mAuth.getCurrentUser();
-                        currentUserId = user.getUid();
+                        currentUserId = Objects.requireNonNull(user).getUid();
                         goToUser();
 
                     } else {
@@ -77,11 +72,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 });
     }
+
     public void goToUser() {
         Intent in = new Intent(this, UserListActivity.class);
         in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(in);
     }
+
     private void submitForm() {
 
 
@@ -95,7 +92,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         Log.i(TAG, "submitForm: ALL VALID");
     }
-
 
 
     private boolean validateEmail() {
@@ -146,7 +142,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private class MyTextWatcher implements TextWatcher {
 
-        private View view;
+        private final View view;
 
         private MyTextWatcher(View view) {
             this.view = view;
@@ -158,6 +154,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         }
 
+        @SuppressLint("NonConstantResourceId")
         public void afterTextChanged(Editable editable) {
             switch (view.getId()) {
 

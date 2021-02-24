@@ -7,31 +7,27 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.whatsappclone.adapters.MyListAdapter;
 import com.example.whatsappclone.models.MyListData;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.example.whatsappclone.MainActivity.currentUserId;
 
 public class UserListActivity extends AppCompatActivity {
 
     static ArrayList<MyListData> userArrayList = new ArrayList<>();
-    static ArrayList<MyListData> userList = new ArrayList<>();
     String uid = "";
 
-    private static final String TAG = "INFO";
+    private static final String TAG = UserListActivity.class.getSimpleName();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
@@ -78,7 +74,7 @@ public class UserListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         setTitle("WhatsApp");
         Log.i(TAG, "onCreate: " + currentUserId);
 
@@ -97,27 +93,27 @@ public class UserListActivity extends AppCompatActivity {
         db.collection("users")
                 .whereNotEqualTo("uid", uid)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
-                                userArrayList.add(new MyListData(document.getString("nickname"), document.getString("uid"), document.getString("imageUrl"), document.getString("lastMessage")));
-
-                            }
-                            Log.i(TAG, "onCreate: " + userArrayList.toString());
-
-                            RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
-                            MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
-//
-                            recyclerView.setHasFixedSize(true);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                            recyclerView.setAdapter(myListAdapter);
-
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Log.d(TAG, document.getId() + " => " + document.getData());
+                            userArrayList.add(new MyListData(
+                                    document.getString("nickname"),
+                                    document.getString("uid"),
+                                    document.getString("imageUrl"),
+                                    document.getString("lastMessage")));
 
                         }
+                        Log.i(TAG, "onCreate: " + userArrayList.toString());
+
+                        RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
+                        MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
+//
+                        recyclerView.setHasFixedSize(true);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                        recyclerView.setAdapter(myListAdapter);
+
+
                     }
                 });
     }
