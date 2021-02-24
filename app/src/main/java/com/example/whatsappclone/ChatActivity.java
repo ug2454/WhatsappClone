@@ -39,7 +39,7 @@ public class ChatActivity extends AppCompatActivity {
     ArrayList<ChatListData> messages = new ArrayList<>();
     ListView listView;
     String nickname = "";
-    String receiverUid = "";
+   static String receiverUid = "";
 
 
     String nicknameCurrentUser = "";

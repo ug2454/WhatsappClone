@@ -27,18 +27,18 @@
         android:layout_toRightOf="@id/userImage"
         android:gravity="center_vertical"
         android:paddingLeft="20dp"
-        android:paddingBottom="30dp"
+        android:paddingBottom="0dp"
         android:text="@string/textview"
         android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/lastMessageTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginLeft="70dp"
+<!--    <TextView-->
+<!--        android:id="@+id/lastMessageTextView"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="40dp"-->
+<!--        android:layout_marginLeft="70dp"-->
 
-        android:textColor="#CACACA"
-        android:text="TextView" />
+<!--        android:textColor="#CACACA"-->
+<!--        android:text="TextView" />-->
 
 </RelativeLayout>

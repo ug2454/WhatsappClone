@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         userDetails.put("timestamp", currentTime);
         userDetails.put("nickname", nickName.getText().toString());
         userDetails.put("imageUrl", "");
-        userDetails.put("lastMessage", "");
+//        userDetails.put("lastMessage", "");
 
         db.collection("users").document(currentUserId).set(userDetails)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))

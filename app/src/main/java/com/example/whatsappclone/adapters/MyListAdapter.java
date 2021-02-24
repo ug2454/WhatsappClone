@@ -54,7 +54,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         holder.textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
         holder.textView.setText(listData.get(position).getUserName().toUpperCase());
-        holder.lastMessageTextView.setText(listData.get(position).getLastMessage());
+//        holder.lastMessageTextView.setText(listData.get(position).getLastMessage());
         if (listData.get(position).getImageUrl().isEmpty()) {
             System.out.println("IN IF");
             holder.imageView.setImageResource(R.drawable.blankimage);
@@ -87,13 +87,13 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
         public TextView textView;
         public ImageView imageView;
         public RelativeLayout relativeLayout;
-        public TextView lastMessageTextView;
+//        public TextView lastMessageTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             this.textView = itemView.findViewById(R.id.textView);
-            this.lastMessageTextView = itemView.findViewById(R.id.lastMessageTextView);
+//            this.lastMessageTextView = itemView.findViewById(R.id.lastMessageTextView);
             this.imageView = itemView.findViewById(R.id.userImage);
             relativeLayout = itemView.findViewById(R.id.relativeLayout);
         }

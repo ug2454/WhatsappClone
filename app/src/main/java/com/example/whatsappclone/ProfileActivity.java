@@ -53,7 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             Log.d(TAG, document.getId() + " => " + document.getData());
                             nickname.setText(document.getString("nickname"));
-                            if (document.get("imageUrl") != null) {
+                            if (document.get("imageUrl") != "") {
                                 String url = (String) document.get("imageUrl");
                                 Picasso.with(getApplicationContext())
                                         .load(url)

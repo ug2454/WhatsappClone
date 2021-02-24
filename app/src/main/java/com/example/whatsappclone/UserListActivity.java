@@ -100,8 +100,9 @@ public class UserListActivity extends AppCompatActivity {
                             userArrayList.add(new MyListData(
                                     document.getString("nickname"),
                                     document.getString("uid"),
-                                    document.getString("imageUrl"),
-                                    document.getString("lastMessage")));
+                                    document.getString("imageUrl")
+//                                    document.getString("lastMessage")
+                            ));
 
                         }
                         Log.i(TAG, "onCreate: " + userArrayList.toString());
