@@ -61,12 +61,12 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="26dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/shape_layout">
+        app:layout_constraintTop_toBottomOf="@+id/uniqueIdTextView">
 
 
         <TextView
@@ -74,9 +74,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="40dp"
-            android:textSize="20dp"
+            android:text="Nickname"
             android:textColor="@color/white"
-            android:text="Nickname" />
+            android:textSize="20dp" />
 
         <EditText
             android:id="@+id/nicknameEditText"
@@ -113,5 +113,22 @@
         app:layout_constraintVertical_bias="0.67"
         app:strokeColor="@color/white"
         app:strokeWidth="2dp" />
+
+    <TextView
+        android:id="@+id/uniqueIdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="181dp"
+        android:layout_marginLeft="181dp"
+        android:layout_marginTop="35dp"
+        android:layout_marginEnd="172dp"
+        android:layout_marginRight="172dp"
+        android:textIsSelectable="true"
+        android:text="TextView"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/shape_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

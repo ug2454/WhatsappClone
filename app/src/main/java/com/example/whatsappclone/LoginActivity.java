@@ -52,45 +52,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     public void clickLogin(View view) {
-        submitForm();
-        mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "signInWithEmail:success");
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        currentUserId = Objects.requireNonNull(user).getUid();
-                        goToUser();
+        if (validateEmail() && isValidEmail(email.getText().toString()) && validatePassword()) {
+            mAuth.signInWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            currentUserId = Objects.requireNonNull(user).getUid();
+                            goToUser();
 
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "signInWithEmail:failure", task.getException());
-                        Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                Toast.LENGTH_SHORT).show();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithEmail:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
 //
-                    }
+                        }
 
-                });
+                    });
+        }
+
     }
 
     public void goToUser() {
         Intent in = new Intent(this, UserListActivity.class);
         in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(in);
-    }
-
-    private void submitForm() {
-
-
-        if (!validateEmail()) {
-            return;
-        }
-
-        if (!validatePassword()) {
-            return;
-        }
-
-        Log.i(TAG, "submitForm: ALL VALID");
     }
 
 

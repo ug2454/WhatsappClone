@@ -1,6 +1,8 @@
 package com.example.whatsappclone;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -32,8 +35,9 @@ public class ProfileActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "INFO";
     EditText nickname;
-
+    TextView uniqueIdTextView;
     String uid = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +46,11 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         setTitle("Profile");
-
+        uniqueIdTextView = findViewById(R.id.uniqueIdTextView);
         nickname = findViewById(R.id.nicknameEditText);
         roundedImage = findViewById(R.id.roundedimage);
-
+        SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE);
+        uniqueIdTextView.setText("Unique ID: "+sharedPreferences.getString("uniqueID", ""));
         db.collection("users").whereEqualTo("uid", uid)
                 .get()
                 .addOnCompleteListener(task -> {

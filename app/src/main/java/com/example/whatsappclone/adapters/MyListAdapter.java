@@ -43,42 +43,46 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        final MyListData myListData = listData.get(position);
-        Context context = holder.itemView.getContext();
+        if(listData.size()!=0){
+            final MyListData myListData = listData.get(position);
+            Context context = holder.itemView.getContext();
 
-        holder.itemView.setPadding(50, 20, 0, 20);
-        holder.itemView.setBackgroundColor(0xFF172228);
-        holder.textView.setTextSize(15);
+            holder.itemView.setPadding(50, 20, 0, 20);
+            holder.itemView.setBackgroundColor(0xFF172228);
+            holder.textView.setTextSize(15);
 
-        holder.textView.setTextColor(0xFFFFFFFF);
-        holder.textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            holder.textView.setTextColor(0xFFFFFFFF);
+            holder.textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
-        holder.textView.setText(listData.get(position).getUserName().toUpperCase());
+            holder.textView.setText(listData.get(position).getUserName().toUpperCase());
 //        holder.lastMessageTextView.setText(listData.get(position).getLastMessage());
-        if (listData.get(position).getImageUrl().isEmpty()) {
-            System.out.println("IN IF");
-            holder.imageView.setImageResource(R.drawable.blankimage);
-            holder.imageView.setBackgroundColor(0xFF172228);
-        } else {
-            System.out.println(listData.get(position).getImageUrl());
-            Picasso.with(context.getApplicationContext())
-                    .load(listData.get(position).getImageUrl())
+            if (listData.get(position).getImageUrl().isEmpty()) {
+                System.out.println("IN IF");
+                holder.imageView.setImageResource(R.drawable.blankimage);
+                holder.imageView.setBackgroundColor(0xFF172228);
+            } else {
+                System.out.println(listData.get(position).getImageUrl());
+                Picasso.with(context.getApplicationContext())
+                        .load(listData.get(position).getImageUrl())
 
-                    .into(holder.imageView);
+                        .into(holder.imageView);
 
+            }
+            holder.relativeLayout.setOnClickListener(view -> {
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra("nickname", myListData.getUserName());
+                intent.putExtra("uid", myListData.getUid());
+                context.startActivity(intent);
+
+            });
         }
-        holder.relativeLayout.setOnClickListener(view -> {
-            Intent intent = new Intent(context, ChatActivity.class);
-            intent.putExtra("nickname", myListData.getUserName());
-            intent.putExtra("uid", myListData.getUid());
-            context.startActivity(intent);
 
-        });
     }
 
 
     @Override
     public int getItemCount() {
+
         return listData.size();
     }
 

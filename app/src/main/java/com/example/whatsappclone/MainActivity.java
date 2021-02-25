@@ -2,7 +2,9 @@ package com.example.whatsappclone;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -28,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -43,7 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextInputLayout emailTextInputLayout, passwordTextInputLayout, nickNameTextInputLayout;
     Date currentTime = Calendar.getInstance().getTime();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-
+    String uniqueUserId="";
+    String uniqueId="";
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -70,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nickNameTextInputLayout = findViewById(R.id.input_layout_name);
         ConstraintLayout constraintLayout = findViewById(R.id.constraintLayout);
         constraintLayout.setOnClickListener(this);
+        uniqueId   = UUID.randomUUID().toString();
+        uniqueId=uniqueId.substring(0,4);
 
 
     }
@@ -85,42 +91,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void clickSignup(View view) {
-        submitForm();
-        if (password.getText().length() > 5) {
-            mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            currentUserId = Objects.requireNonNull(user).getUid();
-                            Log.d(TAG, "clickSignup:" + currentUserId);
-                            addNewUser();
-                            goToNext();
+        if (validateEmail() && validatePassword() && validateName() && isValidEmail(email.getText().toString())) {
+            if (password.getText().length() > 5) {
+                mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
+                        .addOnCompleteListener(this, task -> {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d(TAG, "createUserWithEmail:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                currentUserId = Objects.requireNonNull(user).getUid();
+                                Log.d(TAG, "clickSignup:" + currentUserId);
+                                addNewUser();
+                                goToNext();
 
-//                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
-                        }
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                Toast.makeText(getApplicationContext(), "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
 
-                    });
-        } else {
-            Toast.makeText(this, "Please choose password greater than 5 length", Toast.LENGTH_SHORT).show();
+                        });
+            }
+
         }
 
     }
 
     private void addNewUser() {
+        uniqueUserId=nickName.getText().toString()+uniqueId;
         Map<String, Object> userDetails = new HashMap<>();
         userDetails.put("uid", currentUserId);
         userDetails.put("email", email.getText().toString());
         userDetails.put("timestamp", currentTime);
         userDetails.put("nickname", nickName.getText().toString());
         userDetails.put("imageUrl", "");
+        userDetails.put("uniqueID",uniqueUserId.toUpperCase());
+        SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("nickname", nickName.getText().toString()).apply();
+        sharedPreferences.edit().putString("uniqueID", uniqueUserId.toUpperCase()).apply();
+
+
 //        userDetails.put("lastMessage", "");
 
         db.collection("users").document(currentUserId).set(userDetails)
@@ -145,21 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void submitForm() {
-        if (!validateName()) {
-            return;
-        }
 
-        if (!validateEmail()) {
-            return;
-        }
-
-        if (!validatePassword()) {
-            return;
-        }
-
-        Log.i(TAG, "submitForm: ALL VALID");
-    }
 
     private boolean validateName() {
         if (nickName.getText().toString().trim().isEmpty()) {
