@@ -17,6 +17,7 @@ import com.example.whatsappclone.ChatActivity;
 import com.example.whatsappclone.R;
 import com.example.whatsappclone.models.MyListData;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if(listData.size()!=0){
+        if (listData.size() != 0) {
             final MyListData myListData = listData.get(position);
             Context context = holder.itemView.getContext();
 
@@ -57,10 +58,13 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
             holder.textView.setText(listData.get(position).getUserName().toUpperCase());
 //        holder.lastMessageTextView.setText(listData.get(position).getLastMessage());
             if (listData.get(position).getImageUrl().isEmpty()) {
-                System.out.println("IN IF");
+
+                System.out.println("IN IF" + listData.get(position).getImageUrl());
                 holder.imageView.setImageResource(R.drawable.blankimage);
                 holder.imageView.setBackgroundColor(0xFF172228);
             } else {
+                System.out.println("IN ELSE");
+
                 System.out.println(listData.get(position).getImageUrl());
                 Picasso.with(context.getApplicationContext())
                         .load(listData.get(position).getImageUrl())

@@ -36,11 +36,12 @@ public class UserListActivity extends AppCompatActivity {
     static ArrayList<MyListData> userArrayList = new ArrayList<>();
     String uid = "";
     EditText uniqueIdEditText;
-
+    String uniqueid = "";
     FloatingActionButton addNewFriendFloatingActionButton;
     private static final String TAG = UserListActivity.class.getSimpleName();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    EditText editText;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -54,9 +55,7 @@ public class UserListActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        if (item.getItemId() == R.id.logout) {
-            logOut();
-        } else if (item.getItemId() == R.id.refresh) {
+        if (item.getItemId() == R.id.refresh) {
             refresh();
         } else if (item.getItemId() == R.id.profile) {
             openProfile();
@@ -69,12 +68,6 @@ public class UserListActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void logOut() {
-        FirebaseAuth.getInstance().signOut();
-        Intent intent = new Intent(this, LoginActivity.class);
-        finish();
-        startActivity(intent);
-    }
 
     private void refresh() {
         finish();
@@ -98,7 +91,8 @@ public class UserListActivity extends AppCompatActivity {
             builder.setView(dialogView);
             builder
                     .setPositiveButton("Add Friend", (dialogInterface, i) -> {
-                        EditText editText = dialogView.findViewById(R.id.friendIDEditText);
+                        editText = dialogView.findViewById(R.id.friendIDEditText);
+                        uniqueid = editText.getText().toString();
                         addFriend(editText.getText().toString());
                     })
                     .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
@@ -120,9 +114,11 @@ public class UserListActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                             Log.d(TAG, document.getId() + " => " + document.getData());
+
+                            /*Add current data in friends users' subcollection*/
                             db.collection("users")
                                     .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .collection("userFriends").document().set(document.getData())
+                                    .collection("userFriends").document(document.getString("uniqueID")).set(document.getData())
                                     .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
                                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e)
                                     );
@@ -132,12 +128,15 @@ public class UserListActivity extends AppCompatActivity {
                                     document.getString("imageUrl")
 //                                    document.getString("lastMessage")
                             ));
+
+                            /*Add friend data in current users' subcollection*/
+
                             db.collection("users").whereEqualTo("uniqueID", sharedPreferences.getString("uniqueID", "")).get()
                                     .addOnSuccessListener(queryDocumentSnapshots -> {
                                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                                             db.collection("users")
                                                     .document(document.getString("uid"))
-                                                    .collection("userFriends").document().set(doc.getData())
+                                                    .collection("userFriends").document(sharedPreferences.getString("uniqueID", "")).set(doc.getData())
                                                     .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
                                                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e)
                                                     );
@@ -162,6 +161,7 @@ public class UserListActivity extends AppCompatActivity {
     protected void onResume() {
         userArrayList.clear();
         super.onResume();
+
         db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("userFriends")
 
                 .get()
@@ -177,7 +177,7 @@ public class UserListActivity extends AppCompatActivity {
                             ));
 
                         }
-                        Log.i(TAG, "onCreate: " + userArrayList.toString());
+
 
                         RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
                         MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
