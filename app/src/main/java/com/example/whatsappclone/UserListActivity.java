@@ -35,8 +35,8 @@ public class UserListActivity extends AppCompatActivity {
 
     static ArrayList<MyListData> userArrayList = new ArrayList<>();
     String uid = "";
-    EditText uniqueIdEditText;
     String uniqueid = "";
+    ArrayList<String> friendsList = new ArrayList<>();
     FloatingActionButton addNewFriendFloatingActionButton;
     private static final String TAG = UserListActivity.class.getSimpleName();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -91,6 +91,7 @@ public class UserListActivity extends AppCompatActivity {
             builder.setView(dialogView);
             builder
                     .setPositiveButton("Add Friend", (dialogInterface, i) -> {
+
                         editText = dialogView.findViewById(R.id.friendIDEditText);
                         uniqueid = editText.getText().toString();
                         addFriend(editText.getText().toString());
@@ -98,10 +99,49 @@ public class UserListActivity extends AppCompatActivity {
                     .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.teal_200));
+            alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.teal_200));
         });
 
         userArrayList.clear();
+        db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("userFriends")
 
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            friendsList.add(document.getString("uniqueID"));
+                            Log.d(TAG, document.getId() + " => " + document.getData());
+
+
+                        }
+                        if (friendsList.size() != 0) {
+                            for (int i = 0; i < friendsList.size(); i++) {
+                                db.collection("users").whereEqualTo("uniqueID", friendsList.get(i)).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                                    for (QueryDocumentSnapshot document1 : queryDocumentSnapshots) {
+
+                                        userArrayList.add(new MyListData(
+                                                document1.getString("nickname"),
+                                                document1.getString("uid"),
+                                                document1.getString("imageUrl")
+//                                    document.getString("lastMessage")
+                                        ));
+                                    }
+
+                                    RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
+                                    MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
+//
+                                    recyclerView.setHasFixedSize(true);
+                                    recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                                    recyclerView.setAdapter(myListAdapter);
+
+                                }).addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
+                            }
+                        }
+
+
+                    }
+                });
 
     }
 
@@ -143,6 +183,7 @@ public class UserListActivity extends AppCompatActivity {
                                         }
                                     });
                         }
+
                         RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
                         MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
 //
@@ -159,35 +200,9 @@ public class UserListActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        userArrayList.clear();
+
         super.onResume();
+        userArrayList.clear();
 
-        db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("userFriends")
-
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d(TAG, document.getId() + " => " + document.getData());
-                            userArrayList.add(new MyListData(
-                                    document.getString("nickname"),
-                                    document.getString("uid"),
-                                    document.getString("imageUrl")
-//                                    document.getString("lastMessage")
-                            ));
-
-                        }
-
-
-                        RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
-                        MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
-//
-                        recyclerView.setHasFixedSize(true);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                        recyclerView.setAdapter(myListAdapter);
-
-
-                    }
-                });
     }
 }
