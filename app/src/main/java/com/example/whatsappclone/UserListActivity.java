@@ -80,7 +80,7 @@ public class UserListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
         uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        setTitle("WhatsApp");
+        setTitle("WhatsUp");
         Log.i(TAG, "onCreate: " + currentUserId);
         addNewFriendFloatingActionButton = findViewById(R.id.addNewFriendFloatingActionButton);
         System.out.println("REFRESH");
