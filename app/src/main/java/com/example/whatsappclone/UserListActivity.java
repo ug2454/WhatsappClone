@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -60,7 +61,15 @@ public class UserListActivity extends AppCompatActivity {
         } else if (item.getItemId() == R.id.profile) {
             openProfile();
         }
+        else if(item.getItemId()==R.id.settings){
+            openSettings();
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void openProfile() {
@@ -117,7 +126,7 @@ public class UserListActivity extends AppCompatActivity {
                         }
                         if (friendsList.size() != 0) {
                             for (int i = 0; i < friendsList.size(); i++) {
-                                db.collection("users").whereEqualTo("uniqueID", friendsList.get(i)).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                                db.collection("users").whereEqualTo("uniqueID", friendsList.get(i)).orderBy("nickname").get().addOnSuccessListener(queryDocumentSnapshots -> {
                                     for (QueryDocumentSnapshot document1 : queryDocumentSnapshots) {
 
                                         userArrayList.add(new MyListData(
@@ -146,63 +155,63 @@ public class UserListActivity extends AppCompatActivity {
     }
 
     public void addFriend(String uniqueId) {
-        SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE);
+        if (!friendsList.contains(uniqueId)) {
+            SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE);
 
-        db.collection("users").whereEqualTo("uniqueID", uniqueId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                            Log.d(TAG, document.getId() + " => " + document.getData());
+            db.collection("users").whereEqualTo("uniqueID", uniqueId)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
 
-                            /*Add current data in friends users' subcollection*/
-                            db.collection("users")
-                                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .collection("userFriends").document(document.getString("uniqueID")).set(document.getData())
-                                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
-                                    .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e)
-                                    );
-                            userArrayList.add(new MyListData(
-                                    document.getString("nickname"),
-                                    document.getString("uid"),
-                                    document.getString("imageUrl")
+                            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                                Log.d(TAG, document.getId() + " => " + document.getData());
+
+                                /*Add current data in friends users' subcollection*/
+                                db.collection("users")
+                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .collection("userFriends").document(document.getString("uniqueID")).set(document.getData())
+                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
+                                        .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e)
+                                        );
+                                userArrayList.add(new MyListData(
+                                        document.getString("nickname"),
+                                        document.getString("uid"),
+                                        document.getString("imageUrl")
 //                                    document.getString("lastMessage")
-                            ));
+                                ));
 
-                            /*Add friend data in current users' subcollection*/
+                                /*Add friend data in current users' subcollection*/
 
-                            db.collection("users").whereEqualTo("uniqueID", sharedPreferences.getString("uniqueID", "")).get()
-                                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                                            db.collection("users")
-                                                    .document(document.getString("uid"))
-                                                    .collection("userFriends").document(sharedPreferences.getString("uniqueID", "")).set(doc.getData())
-                                                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
-                                                    .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e)
-                                                    );
-                                        }
-                                    });
-                        }
+                                db.collection("users").whereEqualTo("uniqueID", sharedPreferences.getString("uniqueID", "")).get()
+                                        .addOnSuccessListener(queryDocumentSnapshots -> {
+                                            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                                                db.collection("users")
+                                                        .document(document.getString("uid"))
+                                                        .collection("userFriends").document(sharedPreferences.getString("uniqueID", "")).set(doc.getData())
+                                                        .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
+                                                        .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e)
+                                                        );
+                                            }
+                                        });
+                            }
 
-                        RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
-                        MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
+                            RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
+                            MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
 //
-                        recyclerView.setHasFixedSize(true);
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                        recyclerView.setAdapter(myListAdapter);
-                    } else {
-                        Log.d(TAG, "Error getting documents: ", task.getException());
-                    }
-                });
+                            recyclerView.setHasFixedSize(true);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                            recyclerView.setAdapter(myListAdapter);
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    });
+        }
+        else{
+            Toast.makeText(this, "Friend Already Exists", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
 
-    @Override
-    protected void onResume() {
 
-        super.onResume();
-        userArrayList.clear();
-
-    }
 }

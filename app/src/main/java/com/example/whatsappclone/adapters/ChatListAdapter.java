@@ -4,13 +4,16 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.Build;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.whatsappclone.R;
 import com.example.whatsappclone.models.ChatListData;
@@ -90,17 +93,36 @@ public class ChatListAdapter implements ListAdapter {
                 name.setText(chatListData.getNickname());
                 message.setText(chatListData.getMessage());
                 if (chatListData.getUserType().equals("sender")) {
-                    name.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-                    message.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-                    name.setPadding(0, 0, 100, 10);
-                    message.setPadding(0, 0, 100, 10);
-                    timestampTextView.setPadding(0, 0, 100, 10);
-                    timestampTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+//                    name.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+//                    message.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+                    params.gravity = Gravity.END;
+                    message.setLayoutParams(params);
+                    name.setLayoutParams(params);
+                    timestampTextView.setLayoutParams(params);
+                    message.setGravity(Gravity.START);
+                    name.setPadding(400, 0, 50, 10);
+                    message.setPadding(400, 0, 50, 10);
+                    timestampTextView.setPadding(400, 0, 50, 10);
+//                    timestampTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
 
                 } else {
-                    name.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-                    message.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-                    timestampTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+                    params.gravity = Gravity.START;
+                    message.setLayoutParams(params);
+                    name.setLayoutParams(params);
+                    timestampTextView.setLayoutParams(params);
+                    message.setGravity(Gravity.START);
+//                    name.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+//                    message.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+//                    timestampTextView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+                    message.setPadding(60, 0, 400, 10);
+                    name.setPadding(60, 0, 400, 10);
+                    timestampTextView.setPadding(60, 0, 400, 10);
                 }
             }
         } else {
