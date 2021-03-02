@@ -1,4 +1,4 @@
-# WhatsUp ☁
+# WhatsUp
 
 
 ## About this App
