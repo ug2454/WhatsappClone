@@ -156,7 +156,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
     public void sendMessage(View view) {
-        if (!sendMessageEditText.getText().toString().isEmpty()) {
+        if (!sendMessageEditText.getText().toString().trim().isEmpty()) {
 //            db.collection("users").document(receiverUid).update("lastMessage", sendMessageEditText.getText().toString())
 //                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
 //                    .addOnFailureListener(e -> Log.d(TAG, "DocumentSnapshot failed to update!"));

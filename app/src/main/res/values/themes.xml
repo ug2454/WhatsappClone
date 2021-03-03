@@ -13,5 +13,7 @@
         <item name="android:statusBarColor" tools:targetApi="l">@color/darkgrey</item>
 
         <!-- Customize your theme here. -->
+        <item name="fontFamily">@font/roboto</item>
     </style>
+
 </resources>

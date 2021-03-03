@@ -17,7 +17,6 @@ import com.example.whatsappclone.ChatActivity;
 import com.example.whatsappclone.R;
 import com.example.whatsappclone.models.MyListData;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -103,7 +102,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
             this.textView = itemView.findViewById(R.id.textView);
 //            this.lastMessageTextView = itemView.findViewById(R.id.lastMessageTextView);
             this.imageView = itemView.findViewById(R.id.userImage);
-            relativeLayout = itemView.findViewById(R.id.relativeLayout);
+            relativeLayout = itemView.findViewById(R.id.linearLayoutSettings);
         }
     }
 }

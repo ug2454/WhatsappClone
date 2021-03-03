@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/linearLayoutSettings"
+    android:id="@+id/linearLayoutAccount"
     android:layout_width="match_parent"
     android:layout_height="90dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    >
 
 
     <ImageView
-        android:id="@+id/settingsImage"
+        android:id="@+id/accountsImage"
         android:layout_width="30dip"
         android:layout_height="30dip"
         android:layout_gravity="center"
@@ -17,7 +18,7 @@
         android:layout_marginLeft="30dp" />
 
     <TextView
-        android:id="@+id/settingsText"
+        android:id="@+id/accountsText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_vertical"

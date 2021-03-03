@@ -1,9 +1,7 @@
 package com.example.whatsappclone.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.DataSetObserver;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,22 +9,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.core.content.res.ResourcesCompat;
-
-import com.example.whatsappclone.AccountActivity;
 import com.example.whatsappclone.R;
-import com.example.whatsappclone.models.SettingsListData;
+import com.example.whatsappclone.models.AccountListData;
 
 import java.util.ArrayList;
 
-public class SettingsListAdapter implements ListAdapter {
-    private final ArrayList<SettingsListData> listData;
+public class AccountListAdapter implements ListAdapter {
+    private final ArrayList<AccountListData> listData;
     Context context;
 
-    public SettingsListAdapter(Context context, ArrayList<SettingsListData> listData) {
-        this.listData = listData;
+    public AccountListAdapter(Context context, ArrayList<AccountListData> listData) {
         this.context = context;
+        this.listData = listData;
     }
 
     @Override
@@ -71,28 +67,20 @@ public class SettingsListAdapter implements ListAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        SettingsListData settingsListData = listData.get(i);
-
+        AccountListData accountListData = listData.get(i);
         if (view == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(context);
-            view = layoutInflater.inflate(R.layout.settings_item, null);
-            LinearLayout linearLayoutSettings=view.findViewById(R.id.linearLayoutSettings);
-            TextView settingsText = view.findViewById(R.id.settingsText);
-            ImageView imageView = view.findViewById(R.id.settingsImage);
-            Drawable resImg = ResourcesCompat.getDrawable(context.getResources(), settingsListData.getImage(), null);
+            view = layoutInflater.inflate(R.layout.accounts_item, null);
+            TextView accountTextView = view.findViewById(R.id.accountsText);
+            ImageView accountImageView = view.findViewById(R.id.accountsImage);
+            accountTextView.setText(accountListData.getAccountText());
+            accountImageView.setImageResource(accountListData.getAccountImage());
 
-            settingsText.setText(settingsListData.getSettingsText());
-            imageView.setImageDrawable(resImg);
-
-            linearLayoutSettings.setOnClickListener(view1 -> {
-//                Toast.makeText(context, ""+settingsListData.getSettingsText(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(context, AccountActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+            LinearLayout accountLinearLayout= view.findViewById(R.id.linearLayoutAccount);
+            accountLinearLayout.setOnClickListener(view1 -> {
+                Toast.makeText(context, ""+accountListData.getAccountText(), Toast.LENGTH_SHORT).show();
             });
-
         }
-
         return view;
     }
 
