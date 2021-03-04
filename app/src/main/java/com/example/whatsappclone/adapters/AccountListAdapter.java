@@ -1,6 +1,7 @@
 package com.example.whatsappclone.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,21 +9,45 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
+import com.example.whatsappclone.MainActivity;
 import com.example.whatsappclone.R;
 import com.example.whatsappclone.models.AccountListData;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.functions.FirebaseFunctions;
+import com.google.firebase.functions.FirebaseFunctionsException;
+import com.google.firebase.functions.HttpsCallableReference;
+import com.google.firebase.functions.HttpsCallableResult;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.example.whatsappclone.AccountActivity.imageName;
 
 public class AccountListAdapter implements ListAdapter {
     private final ArrayList<AccountListData> listData;
     Context context;
+    ListView parentListView;
+    private FirebaseFunctions mFunctions;
+    ProgressBar progressBarActivity;
 
-    public AccountListAdapter(Context context, ArrayList<AccountListData> listData) {
+
+    public AccountListAdapter(Context context, ArrayList<AccountListData> listData, ListView parentListView, ProgressBar progressBarActivity) {
         this.context = context;
         this.listData = listData;
+        this.parentListView = parentListView;
+        this.progressBarActivity = progressBarActivity;
     }
 
     @Override
@@ -67,21 +92,107 @@ public class AccountListAdapter implements ListAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+        mFunctions = FirebaseFunctions.getInstance();
         AccountListData accountListData = listData.get(i);
         if (view == null) {
-            LayoutInflater layoutInflater = LayoutInflater.from(context);
-            view = layoutInflater.inflate(R.layout.accounts_item, null);
+            LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
+            view = layoutInflater.inflate(R.layout.accounts_item, parentListView, false);
+
             TextView accountTextView = view.findViewById(R.id.accountsText);
             ImageView accountImageView = view.findViewById(R.id.accountsImage);
             accountTextView.setText(accountListData.getAccountText());
             accountImageView.setImageResource(accountListData.getAccountImage());
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            LinearLayout accountLinearLayout = view.findViewById(R.id.linearLayoutAccount);
 
-            LinearLayout accountLinearLayout= view.findViewById(R.id.linearLayoutAccount);
-            accountLinearLayout.setOnClickListener(view1 -> {
-                Toast.makeText(context, ""+accountListData.getAccountText(), Toast.LENGTH_SHORT).show();
+
+            view.setOnClickListener(view1 -> {
+                if (accountListData.getAccountText().equals("Delete my account")) {
+                    progressBarActivity.setVisibility(View.VISIBLE);
+                    context.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE).edit().clear().apply();
+                    deleteAtPath("/message/" + uid);
+                    deleteAtPath("/users/" + uid);
+
+                    FirebaseStorage.getInstance().getReference().child("images").child(imageName).delete()
+                            .addOnSuccessListener(aVoid -> System.out.println("Image deleted"))
+                            .addOnFailureListener(e -> System.out.println(e.getMessage()));
+
+
+                    addMessage(uid).addOnCompleteListener(task -> {
+                        if (!task.isSuccessful()) {
+                            Exception e = task.getException();
+                            if (e instanceof FirebaseFunctionsException) {
+                                FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+                                FirebaseFunctionsException.Code code = ffe.getCode();
+                                Object details = ffe.getDetails();
+
+
+                            }
+
+                        } else {
+                            FirebaseAuth.getInstance().signOut();
+                            progressBarActivity.setVisibility(View.GONE);
+                            Toast.makeText(context, "Account successfully deleted", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(context.getApplicationContext(), MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            context.startActivity(intent);
+                        }
+
+
+                    });
+
+                }
+
             });
+
         }
         return view;
+    }
+
+    /**
+     * Call the 'recursiveDelete' callable function with a path to initiate
+     * a server-side delete.
+     */
+    public void deleteAtPath(String path) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("path", path);
+
+        HttpsCallableReference deleteFn =
+                FirebaseFunctions.getInstance().getHttpsCallable("recursiveDelete");
+        deleteFn.call(data)
+                .addOnSuccessListener(new OnSuccessListener<HttpsCallableResult>() {
+                    @Override
+                    public void onSuccess(HttpsCallableResult httpsCallableResult) {
+                        System.out.println("delete success");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        System.out.println("delete failed");
+                    }
+                });
+    }
+
+
+    private Task<String> addMessage(String text) {
+        // Create the arguments to the callable function.
+        Map<String, Object> data = new HashMap<>();
+        data.put("text", text);
+        data.put("push", true);
+
+
+        return mFunctions
+                .getHttpsCallable("addMessage")
+                .call(data)
+                .continueWith(task -> {
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then getResult() will throw an Exception which will be
+                    // propagated down.
+                    String result = (String) task.getResult().getData();
+                    System.out.println(result);
+                    return result;
+                });
     }
 
     @Override

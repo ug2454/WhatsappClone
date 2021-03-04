@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +39,8 @@ public class ProfileActivity extends AppCompatActivity {
     EditText nickname;
     TextView uniqueIdTextView;
     String uid = "";
-
+    ProgressBar progressBar;
+    Button cameraButton,saveButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +49,17 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         setTitle("Profile");
+        cameraButton=findViewById(R.id.cameraButton);
+        saveButton=findViewById(R.id.saveButton);
         uniqueIdTextView = findViewById(R.id.uniqueIdTextView);
         nickname = findViewById(R.id.nicknameEditText);
         roundedImage = findViewById(R.id.roundedimage);
+        progressBar = findViewById(R.id.progressBarActivity);
+        progressBar.setVisibility(View.VISIBLE);
         SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE);
-        uniqueIdTextView.setText("Unique ID: "+sharedPreferences.getString("uniqueID", ""));
+        uniqueIdTextView.setText("Unique ID: " + sharedPreferences.getString("uniqueID", ""));
+        cameraButton.setEnabled(false);
+        saveButton.setEnabled(false);
         db.collection("users").whereEqualTo("uid", uid)
                 .get()
                 .addOnCompleteListener(task -> {
@@ -64,9 +73,15 @@ public class ProfileActivity extends AppCompatActivity {
                                         .load(url)
 
                                         .into(roundedImage);
+                                progressBar.setVisibility(View.GONE);
+                                cameraButton.setEnabled(true);
+                                saveButton.setEnabled(true);
                             } else {
                                 roundedImage.setImageResource(R.drawable.blankimage);
                                 roundedImage.setBackgroundColor(0xFF172228);
+                                progressBar.setVisibility(View.GONE);
+                                cameraButton.setEnabled(true);
+                                saveButton.setEnabled(true);
                             }
 
                         }
@@ -92,9 +107,12 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
+            progressBar.setVisibility(View.VISIBLE);
             roundedImage = findViewById(R.id.roundedimage);
-
-
+            saveButton.setEnabled(false);
+            cameraButton.setEnabled(false);
+            SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE);
+            sharedPreferences.edit().putString("imageName", imageName).apply();
             assert data != null;
             uri1 = data.getData();
             System.out.println(uri1.toString());
@@ -116,7 +134,9 @@ public class ProfileActivity extends AppCompatActivity {
                             .load(url)
 
                             .into(roundedImage);
-
+                    cameraButton.setEnabled(true);
+                    progressBar.setVisibility(View.GONE);
+                    saveButton.setEnabled(true);
                 });
             });
 

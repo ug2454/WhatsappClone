@@ -7,6 +7,21 @@
     android:background="#172228"
     tools:context=".ProfileActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBarActivity"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+
+        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.472" />
+
     <RelativeLayout
         android:id="@+id/shape_layout"
         android:layout_width="200dp"
@@ -42,7 +57,7 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/cameraButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="182dp"
@@ -99,7 +114,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#172228"

@@ -9,5 +9,8 @@
     <color name="white">#FFFFFFFF</color>
 <!--    <color name="darkgrey">#172228</color>-->
     <color name="darkgrey">#03344f</color>
+    <color name="grey">#AFAFAF</color>
+
+    <color name="darkblue">#172228</color>
 
 </resources>

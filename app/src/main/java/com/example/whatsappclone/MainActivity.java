@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,12 +43,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button loginButton;
     static FirebaseUser currentUser;
     FirebaseAuth mAuth;
+    ProgressBar progressBarSignUp;
     static String currentUserId;
     TextInputLayout emailTextInputLayout, passwordTextInputLayout, nickNameTextInputLayout;
     Date currentTime = Calendar.getInstance().getTime();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    String uniqueUserId="";
-    String uniqueId="";
+    String uniqueUserId = "";
+    String uniqueId = "";
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -72,10 +74,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         emailTextInputLayout = findViewById(R.id.input_layout_email);
         passwordTextInputLayout = findViewById(R.id.input_layout_password);
         nickNameTextInputLayout = findViewById(R.id.input_layout_name);
+        progressBarSignUp = findViewById(R.id.progressBarSignUp);
         ConstraintLayout constraintLayout = findViewById(R.id.constraintLayout);
         constraintLayout.setOnClickListener(this);
-        uniqueId   = UUID.randomUUID().toString();
-        uniqueId=uniqueId.substring(0,4);
+        uniqueId = UUID.randomUUID().toString();
+        uniqueId = uniqueId.substring(0, 4);
+
+        progressBarSignUp.setVisibility(View.GONE);
 
 
     }
@@ -91,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void clickSignup(View view) {
+        progressBarSignUp.setVisibility(View.VISIBLE);
         if (validateEmail() && validatePassword() && validateName() && isValidEmail(email.getText().toString())) {
             if (password.getText().length() > 5) {
                 mAuth.createUserWithEmailAndPassword(email.getText().toString(), password.getText().toString())
@@ -102,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 currentUserId = Objects.requireNonNull(user).getUid();
                                 Log.d(TAG, "clickSignup:" + currentUserId);
                                 addNewUser();
+                                progressBarSignUp.setVisibility(View.GONE);
                                 goToNext();
 
                             } else {
@@ -119,14 +126,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void addNewUser() {
-        uniqueUserId=nickName.getText().toString()+uniqueId;
+        uniqueUserId = nickName.getText().toString() + uniqueId;
         Map<String, Object> userDetails = new HashMap<>();
         userDetails.put("uid", currentUserId);
         userDetails.put("email", email.getText().toString());
         userDetails.put("timestamp", currentTime);
         userDetails.put("nickname", nickName.getText().toString());
         userDetails.put("imageUrl", "");
-        userDetails.put("uniqueID",uniqueUserId.toUpperCase());
+        userDetails.put("uniqueID", uniqueUserId.toUpperCase());
         SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("nickname", nickName.getText().toString()).apply();
         sharedPreferences.edit().putString("uniqueID", uniqueUserId.toUpperCase()).apply();
@@ -155,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
-
 
 
     private boolean validateName() {

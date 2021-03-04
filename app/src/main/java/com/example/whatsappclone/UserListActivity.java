@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +38,7 @@ public class UserListActivity extends AppCompatActivity {
     static ArrayList<MyListData> userArrayList = new ArrayList<>();
     String uid = "";
     String uniqueid = "";
+    ProgressBar progressBarUserList;
     ArrayList<String> friendsList = new ArrayList<>();
     FloatingActionButton addNewFriendFloatingActionButton;
     private static final String TAG = UserListActivity.class.getSimpleName();
@@ -88,6 +90,8 @@ public class UserListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
+        progressBarUserList=findViewById(R.id.progressBarUserList);
+        progressBarUserList.setVisibility(View.VISIBLE);
         uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         setTitle("WhatsUp");
         Log.i(TAG, "onCreate: " + currentUserId);
@@ -137,6 +141,7 @@ public class UserListActivity extends AppCompatActivity {
                                         ));
                                     }
 
+
                                     RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
                                     MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
 //
@@ -146,6 +151,9 @@ public class UserListActivity extends AppCompatActivity {
 
                                 }).addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
                             }
+                        }
+                        else{
+                            progressBarUserList.setVisibility(View.GONE);
                         }
 
 
