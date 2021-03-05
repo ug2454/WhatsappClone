@@ -151,6 +151,7 @@ public class UserListActivity extends AppCompatActivity {
 
                                 }).addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
                             }
+                            progressBarUserList.setVisibility(View.GONE);
                         }
                         else{
                             progressBarUserList.setVisibility(View.GONE);

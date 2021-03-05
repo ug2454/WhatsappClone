@@ -142,7 +142,7 @@ public class ChatListAdapter implements ListAdapter {
 
     @Override
     public int getItemViewType(int i) {
-        return 0;
+        return i;
     }
 
     @Override
@@ -150,7 +150,7 @@ public class ChatListAdapter implements ListAdapter {
         if (chatDataList.isEmpty()) {
             return 1;
         }
-        return chatDataList.size();
+        return getCount();
     }
 
     @Override

@@ -72,7 +72,7 @@ public class ChatActivity extends AppCompatActivity {
         setTitle(nickname);
 
 
-
+        messages.clear();
         getMessageCountFirebase();
 
         getNickNameFirebase();
