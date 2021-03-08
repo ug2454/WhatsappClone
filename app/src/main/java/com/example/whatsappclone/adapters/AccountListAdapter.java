@@ -113,10 +113,11 @@ public class AccountListAdapter implements ListAdapter {
                     deleteAtPath("/message/" + uid);
                     deleteAtPath("/users/" + uid);
 
-                    FirebaseStorage.getInstance().getReference().child("images").child(imageName).delete()
-                            .addOnSuccessListener(aVoid -> System.out.println("Image deleted"))
-                            .addOnFailureListener(e -> System.out.println(e.getMessage()));
-
+                    if (!imageName.equals("")) {
+                        FirebaseStorage.getInstance().getReference().child("images").child(imageName).delete()
+                                .addOnSuccessListener(aVoid -> System.out.println("Image deleted"))
+                                .addOnFailureListener(e -> System.out.println(e.getMessage()));
+                    }
 
                     addMessage(uid).addOnCompleteListener(task -> {
                         if (!task.isSuccessful()) {

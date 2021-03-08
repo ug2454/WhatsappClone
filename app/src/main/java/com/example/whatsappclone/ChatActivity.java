@@ -6,14 +6,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toolbar;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.app.NavUtils;
 
 import com.example.whatsappclone.adapters.ChatListAdapter;
@@ -39,7 +36,7 @@ public class ChatActivity extends AppCompatActivity {
     ArrayList<ChatListData> messages = new ArrayList<>();
     ListView listView;
     String nickname = "";
-   static String receiverUid = "";
+    static String receiverUid = "";
 
 
     String nicknameCurrentUser = "";
@@ -197,7 +194,7 @@ public class ChatActivity extends AppCompatActivity {
                             messageDetails1.put("messageCount", messageCountSender);
                             messageDetails1.put("userType", "receiver");
                             messageDetails1.put("email", emailFirebaseAuth);
-                            messageDetails.put("nickname", nicknameCurrentUser);
+                            messageDetails1.put("nickname", nicknameCurrentUser);
 
                             db.collection("message").document(receiverUid).collection(uid).document()
                                     .set(messageDetails1)
@@ -210,6 +207,10 @@ public class ChatActivity extends AppCompatActivity {
                                     })
                                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
 
+                            db.collection("messageNotification").document(receiverUid).collection("message").document().set(messageDetails1)
+                                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
+                                    .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
+
 
                             sendMessageEditText.setText("");
                         } else {
@@ -220,7 +221,6 @@ public class ChatActivity extends AppCompatActivity {
 
 
     }
-
 
 
     @Override

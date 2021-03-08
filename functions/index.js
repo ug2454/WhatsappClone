@@ -59,3 +59,104 @@ admin.initializeApp();
          path: path
        };
      });
+
+//     exports.onCreateActivityFeedItem = functions.firestore
+//       .document("/messageNotification/{userId}/message/{messageId}")
+//       .onCreate(async (snapshot, context) => {
+//         console.log("Activity feed item created", snapshot.data());
+//
+//         //1) get the user connected to the feed
+//
+//         const userId = context.params.userId;
+//         const userRef = admin.firestore().doc(`users/${userId}`);
+//
+//         const doc = await userRef.get();
+//
+//         //2 once we have the user, check if they have notification token, send notification if they have a token
+//         const androidNotificationToken = doc.data().androidNotificationToken;
+//         console.log(androidNotificationToken);
+//         const createdActivityFeedItem = snapshot.data();
+//         if (androidNotificationToken) {
+//           //send notification
+//           sendNotification(androidNotificationToken, createdActivityFeedItem);
+//         } else {
+//           console.log("No token for user, cannot user notification");
+//         }
+//
+//         function sendNotification(androidNotificationToken, activityFeedItem) {
+//           let body;
+//           //switch body value based off of notification type
+//           body = `${activityFeedItem.message}`;
+//
+//           }
+//           //create message for push notifications
+//           const message = {
+//             notification: { body },
+//             token: androidNotificationToken,
+//             data: { recipient: userId },
+//           };
+//
+//           //send message with admin.messaging()
+//           admin
+//             .messaging()
+//             .send(message)
+//             .then((response) => {
+//               console.log("Successfully sent message", response);
+//             })
+//             .catch((err) => {
+//               console.log("Error sending message", err);
+//             });
+//         }
+//
+//       });
+
+
+       exports.onCreateActivityFeedItem = functions.firestore
+           .document('/messageNotification/{userId}/message/{messageId}')
+           .onCreate(async(snapshot, context) => {
+                    console.log("Activity feed item created", snapshot.data());
+
+                    //1) get the user connected to the feed
+
+                    const userId = context.params.userId;
+                    const userRef = admin.firestore().doc(`users/${userId}`);
+
+                    const doc = await userRef.get();
+
+                    //2 once we have the user, check if they have notification token, send notification if they have a token
+                    const androidNotificationToken = doc.data().androidNotificationToken;
+                    console.log(androidNotificationToken);
+                    const createdActivityFeedItem = snapshot.data();
+                    if (androidNotificationToken) {
+                      //send notification
+                      sendNotification(androidNotificationToken, createdActivityFeedItem);
+                    } else {
+                      console.log("No token for user, cannot user notification");
+                    }
+
+                    function sendNotification(androidNotificationToken, activityFeedItem) {
+                      let body;
+                      //switch body value based off of notification type
+                      body = `${activityFeedItem.nickname}:  ${activityFeedItem.message}`;
+                      console.log(body);
+
+                      //create message for push notifications
+                      const message = {
+                        notification: { body },
+                        token: androidNotificationToken,
+                        data: { recipient: userId },
+                      };
+
+                      //send message with admin.messaging()
+                      admin
+                        .messaging()
+                        .send(message)
+                        .then((response) => {
+                          console.log("Successfully sent message", response);
+                        })
+                        .catch((err) => {
+                          console.log("Error sending message", err);
+                        });
+                    }
+           });
+
