@@ -1,21 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/linearLayoutSettings"
+    android:id="@+id/linearLayoutUserList"
     android:layout_width="match_parent"
     android:layout_height="90dp"
     android:background="@drawable/border">
 
 
-    <ImageView
-        android:id="@+id/userImage"
+    <RelativeLayout
+        android:id="@+id/shape_layout"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/circle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        android:layout_marginTop="14dp"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/myCardView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
 
-        android:scaleType="centerCrop"
-        android:src="@drawable/blankimage" />
+
+            app:cardCornerRadius="100dp"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/userImage"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+
+
+                android:scaleType="centerCrop"
+                android:src="@drawable/blankimage" />
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
 
 
     <TextView
@@ -31,14 +57,14 @@
         android:text="@string/textview"
         android:textSize="16sp" />
 
-<!--    <TextView-->
-<!--        android:id="@+id/lastMessageTextView"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="40dp"-->
-<!--        android:layout_marginLeft="70dp"-->
+    <!--    <TextView-->
+    <!--        android:id="@+id/lastMessageTextView"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="40dp"-->
+    <!--        android:layout_marginLeft="70dp"-->
 
-<!--        android:textColor="#CACACA"-->
-<!--        android:text="TextView" />-->
+    <!--        android:textColor="#CACACA"-->
+    <!--        android:text="TextView" />-->
 
-</RelativeLayout>
+</LinearLayout>

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 
 public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder> {
     private final ArrayList<MyListData> listData;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     private static final String TAG = "INFO";
 
     public MyListAdapter(ArrayList<MyListData> listData) {
@@ -58,11 +59,11 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 //        holder.lastMessageTextView.setText(listData.get(position).getLastMessage());
             if (listData.get(position).getImageUrl().isEmpty()) {
 
-                System.out.println("IN IF" + listData.get(position).getImageUrl());
+
                 holder.imageView.setImageResource(R.drawable.blankimage);
                 holder.imageView.setBackgroundColor(0xFF172228);
             } else {
-                System.out.println("IN ELSE");
+
 
                 System.out.println(listData.get(position).getImageUrl());
                 Picasso.with(context.getApplicationContext())
@@ -71,7 +72,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
                         .into(holder.imageView);
 
             }
-            holder.relativeLayout.setOnClickListener(view -> {
+            holder.linearLayout.setOnClickListener(view -> {
                 Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra("nickname", myListData.getUserName());
                 intent.putExtra("uid", myListData.getUid());
@@ -93,7 +94,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
 
         public TextView textView;
         public ImageView imageView;
-        public RelativeLayout relativeLayout;
+        public LinearLayout linearLayout;
 //        public TextView lastMessageTextView;
 
         public ViewHolder(View itemView) {
@@ -102,7 +103,7 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.ViewHolder
             this.textView = itemView.findViewById(R.id.textView);
 //            this.lastMessageTextView = itemView.findViewById(R.id.lastMessageTextView);
             this.imageView = itemView.findViewById(R.id.userImage);
-            relativeLayout = itemView.findViewById(R.id.linearLayoutSettings);
+            linearLayout = itemView.findViewById(R.id.linearLayoutUserList);
         }
     }
 }

@@ -112,6 +112,7 @@ public class AccountListAdapter implements ListAdapter {
                     context.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE).edit().clear().apply();
                     deleteAtPath("/message/" + uid);
                     deleteAtPath("/users/" + uid);
+                    deleteAtPath("/messageNotification/" + uid);
 
                     if (!imageName.equals("")) {
                         FirebaseStorage.getInstance().getReference().child("images").child(imageName).delete()

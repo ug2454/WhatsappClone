@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -62,8 +63,7 @@ public class UserListActivity extends AppCompatActivity {
             refresh();
         } else if (item.getItemId() == R.id.profile) {
             openProfile();
-        }
-        else if(item.getItemId()==R.id.settings){
+        } else if (item.getItemId() == R.id.settings) {
             openSettings();
         }
         return super.onOptionsItemSelected(item);
@@ -90,24 +90,30 @@ public class UserListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
-        progressBarUserList=findViewById(R.id.progressBarUserList);
+        progressBarUserList = findViewById(R.id.progressBarUserList);
         progressBarUserList.setVisibility(View.VISIBLE);
         uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         setTitle("WhatsUp");
         Log.i(TAG, "onCreate: " + currentUserId);
         addNewFriendFloatingActionButton = findViewById(R.id.addNewFriendFloatingActionButton);
-        System.out.println("REFRESH");
+
         addNewFriendFloatingActionButton.setOnClickListener(view -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             ViewGroup viewGroup = findViewById(android.R.id.content);
-            View dialogView = LayoutInflater.from(view.getContext()).inflate(R.layout.add_new_friend_dialog, viewGroup, false);
+            View dialogView = LayoutInflater.from(view.getContext()).inflate(R.layout.add_new_friend_dialog, viewGroup, false);   //customized dialog
             builder.setView(dialogView);
             builder
                     .setPositiveButton("Add Friend", (dialogInterface, i) -> {
 
                         editText = dialogView.findViewById(R.id.friendIDEditText);
+                        editText.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
                         uniqueid = editText.getText().toString();
-                        addFriend(editText.getText().toString());
+                        if (!uniqueid.trim().equals("")) {
+                            addFriend(editText.getText().toString());
+                        } else {
+                            Toast.makeText(this, "Please enter a valid ID", Toast.LENGTH_SHORT).show();
+                        }
+
                     })
                     .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel());
             AlertDialog alertDialog = builder.create();
@@ -151,11 +157,8 @@ public class UserListActivity extends AppCompatActivity {
 
                                 }).addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
                             }
-                            progressBarUserList.setVisibility(View.GONE);
                         }
-                        else{
-                            progressBarUserList.setVisibility(View.GONE);
-                        }
+                        progressBarUserList.setVisibility(View.GONE);
 
 
                     }
@@ -211,16 +214,19 @@ public class UserListActivity extends AppCompatActivity {
                             recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                             recyclerView.setAdapter(myListAdapter);
                         } else {
+
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
-                    });
-        }
-        else{
+                    }).addOnFailureListener(e -> {
+                        System.out.println("FAILURE");
+                Log.d(TAG, "addFriend: FRIEND ID DOES NOT EXIST");
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        } else {
             Toast.makeText(this, "Friend Already Exists", Toast.LENGTH_SHORT).show();
         }
 
     }
-
 
 
 }
