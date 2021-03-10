@@ -15,18 +15,31 @@ import androidx.core.app.NavUtils;
 
 import com.example.whatsappclone.adapters.ChatListAdapter;
 import com.example.whatsappclone.models.ChatListData;
+import com.example.whatsappclone.utils.AESUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -37,8 +50,8 @@ public class ChatActivity extends AppCompatActivity {
     ListView listView;
     String nickname = "";
     static String receiverUid = "";
-
-
+    Cipher cipher;
+    KeyPair pair;
     String nicknameCurrentUser = "";
 
     Date currentTime = Calendar.getInstance().getTime();
@@ -76,6 +89,45 @@ public class ChatActivity extends AppCompatActivity {
 
         getChatMessagesFirebase();
 
+        try {
+            Signature sign = Signature.getInstance("SHA256withRSA");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        //Creating KeyPair generator object
+        KeyPairGenerator keyPairGen = null;
+        try {
+            keyPairGen = KeyPairGenerator.getInstance("RSA");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        //Initializing the key pair generator
+        keyPairGen.initialize(2048);
+
+        //Generate the pair of keys
+        pair = keyPairGen.generateKeyPair();
+
+        //Getting the public key from the key pair
+        PublicKey publicKey = pair.getPublic();
+
+        //Creating a Cipher object
+        try {
+            cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        }
+
+        //Initializing a Cipher object
+        try {
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -93,16 +145,26 @@ public class ChatActivity extends AppCompatActivity {
                     messages.clear();
                     for (QueryDocumentSnapshot doc : Objects.requireNonNull(value)) {
                         String messageContent = doc.getString("message");
+                        //Initializing the same cipher for decryption
+
+                        String decrypted = "";
+                        try {
+                            decrypted = AESUtils.decrypt(messageContent);
+                            Log.d("TEST", "decrypted:" + decrypted);
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+
                         String userType = doc.getString("userType");
                         Date timestamp = Objects.requireNonNull(doc.getTimestamp("timestamp")).toDate();
                         assert userType != null;
                         if (userType.equals("receiver")) {
 //
-                            messages.add(new ChatListData(nickname, messageContent, userType, timestamp));
+                            messages.add(new ChatListData(nickname, decrypted, userType, timestamp));
 
                         } else {
 
-                            messages.add(new ChatListData(doc.getString("nickname"), messageContent, userType, timestamp));
+                            messages.add(new ChatListData(doc.getString("nickname"), decrypted, userType, timestamp));
                         }
 
 
@@ -152,11 +214,22 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    public void sendMessage(View view) {
+    public void sendMessage(View view) throws BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException {
         if (!sendMessageEditText.getText().toString().trim().isEmpty()) {
 //            db.collection("users").document(receiverUid).update("lastMessage", sendMessageEditText.getText().toString())
 //                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully updated!"))
 //                    .addOnFailureListener(e -> Log.d(TAG, "DocumentSnapshot failed to update!"));
+            String encrypted = "";
+
+            try {
+                encrypted = AESUtils.encrypt(sendMessageEditText.getText().toString());
+                Log.d("TEST", "encrypted:" + encrypted);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            String finalEncrypted = encrypted;
             db.collection("messageCount")
                     .get()
                     .addOnCompleteListener(task -> {
@@ -167,7 +240,7 @@ public class ChatActivity extends AppCompatActivity {
 
                             }
                             Map<String, Object> messageDetails = new HashMap<>();
-                            messageDetails.put("message", sendMessageEditText.getText().toString());
+                            messageDetails.put("message", finalEncrypted);
                             messageDetails.put("senderId", receiverUid);
                             messageDetails.put("timestamp", currentTime);
                             messageDetails.put("messageCount", messageCountSender);
@@ -188,13 +261,14 @@ public class ChatActivity extends AppCompatActivity {
                                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
 
                             Map<String, Object> messageDetails1 = new HashMap<>();
-                            messageDetails1.put("message", sendMessageEditText.getText().toString());
+                            messageDetails1.put("message",finalEncrypted);
                             messageDetails1.put("senderId", receiverUid);
                             messageDetails1.put("timestamp", currentTime);
                             messageDetails1.put("messageCount", messageCountSender);
                             messageDetails1.put("userType", "receiver");
                             messageDetails1.put("email", emailFirebaseAuth);
                             messageDetails1.put("nickname", nicknameCurrentUser);
+
 
                             db.collection("message").document(receiverUid).collection(uid).document()
                                     .set(messageDetails1)
