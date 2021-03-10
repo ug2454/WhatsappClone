@@ -3,7 +3,8 @@
 
 ## About this App
 
-A chat app where you can signup and send messages to your friends and also update your profile image and nickname.
+A chat app where you can signup and send messages to your friends and also update your profile image and nickname, receive notifications when app is in background. All your messages are end to end encrypted.
+
 
 ![Finished App](https://cdn.discordapp.com/attachments/283947045163630593/816209300233256990/20210302_125351.gif)
 
