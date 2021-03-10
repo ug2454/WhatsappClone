@@ -138,6 +138,8 @@ admin.initializeApp();
 
                     function sendNotification(androidNotificationToken, activityFeedItem) {
                       let body;
+
+
                       //switch body value based off of notification type
                       body = `${activityFeedItem.nickname}:  ${activityFeedItem.message}`;
                       console.log(body);

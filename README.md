@@ -29,6 +29,7 @@ A chat app where you can signup and send messages to your friends and also updat
 - End to End message encryption
 
 
+
 ---
 
 ## Features:
@@ -43,3 +44,4 @@ A chat app where you can signup and send messages to your friends and also updat
 - Push notifications when someone sends you a message
 - Delete account details
 - End to End message encryption
+- Clear All messages of specific chat

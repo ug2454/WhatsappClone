@@ -1,9 +1,12 @@
 package com.example.whatsappclone;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -21,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -130,6 +134,45 @@ public class ChatActivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.chat_menu, menu);
+        return true;
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        } else if (item.getItemId() == R.id.clear_message) {
+            clearMessages();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void clearMessages() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);/* context problem*/
+//                    View dialogView = LayoutInflater.from(finalView.getContext()).inflate(R.layout.delete_account_dialog, viewGroup, false);   //customized
+//                    builder.setView(dialogView);
+        builder.setMessage("Are you sure?").setTitle("Delete All Messages");
+        builder.setPositiveButton("Yes",(dialogInterface, i) -> {
+            db.collection("message").document(uid).collection(receiverUid).get().addOnCompleteListener(task -> {
+                for(QueryDocumentSnapshot snapshots: Objects.requireNonNull(task.getResult())){
+                    snapshots.getReference().delete();
+                }
+            });
+        }).setNegativeButton("No",(dialogInterface, i) -> dialogInterface.cancel());
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+        Log.i(TAG, "clearMessages: ");
+
+    }
+
 
     private void getChatMessagesFirebase() {
         db.collection("message")
@@ -261,7 +304,7 @@ public class ChatActivity extends AppCompatActivity {
                                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
 
                             Map<String, Object> messageDetails1 = new HashMap<>();
-                            messageDetails1.put("message",finalEncrypted);
+                            messageDetails1.put("message", finalEncrypted);
                             messageDetails1.put("senderId", receiverUid);
                             messageDetails1.put("timestamp", currentTime);
                             messageDetails1.put("messageCount", messageCountSender);
@@ -281,7 +324,16 @@ public class ChatActivity extends AppCompatActivity {
                                     })
                                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
 
-                            db.collection("messageNotification").document(receiverUid).collection("message").document().set(messageDetails1)
+                            Map<String, Object> messageDetails2 = new HashMap<>();
+                            messageDetails2.put("message", sendMessageEditText.getText().toString());
+                            messageDetails2.put("senderId", receiverUid);
+                            messageDetails2.put("timestamp", currentTime);
+                            messageDetails2.put("messageCount", messageCountSender);
+                            messageDetails2.put("userType", "receiver");
+                            messageDetails2.put("email", emailFirebaseAuth);
+                            messageDetails2.put("nickname", nicknameCurrentUser);
+
+                            db.collection("messageNotification").document(receiverUid).collection("message").document().set(messageDetails2)
                                     .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
                                     .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
 
@@ -294,16 +346,6 @@ public class ChatActivity extends AppCompatActivity {
         }
 
 
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
 
