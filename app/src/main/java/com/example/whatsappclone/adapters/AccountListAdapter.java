@@ -1,5 +1,6 @@
 package com.example.whatsappclone.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.whatsappclone.AccountActivity;
 import com.example.whatsappclone.MainActivity;
 import com.example.whatsappclone.R;
 import com.example.whatsappclone.models.AccountListData;
@@ -41,7 +43,7 @@ public class AccountListAdapter implements ListAdapter {
     ListView parentListView;
     private FirebaseFunctions mFunctions;
     ProgressBar progressBarActivity;
-
+    AlertDialog.Builder builder;
 
     public AccountListAdapter(Context context, ArrayList<AccountListData> listData, ListView parentListView, ProgressBar progressBarActivity) {
         this.context = context;
@@ -94,6 +96,7 @@ public class AccountListAdapter implements ListAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         mFunctions = FirebaseFunctions.getInstance();
         AccountListData accountListData = listData.get(i);
+
         if (view == null) {
             LayoutInflater layoutInflater = LayoutInflater.from(viewGroup.getContext());
             view = layoutInflater.inflate(R.layout.accounts_item, parentListView, false);
@@ -106,42 +109,56 @@ public class AccountListAdapter implements ListAdapter {
             LinearLayout accountLinearLayout = view.findViewById(R.id.linearLayoutAccount);
 
 
+            View finalView = view;
             view.setOnClickListener(view1 -> {
                 if (accountListData.getAccountText().equals("Delete my account")) {
-                    progressBarActivity.setVisibility(View.VISIBLE);
-                    context.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE).edit().clear().apply();
-                    deleteAtPath("/message/" + uid);
-                    deleteAtPath("/users/" + uid);
-                    deleteAtPath("/messageNotification/" + uid);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);/* context problem*/
+//                    View dialogView = LayoutInflater.from(finalView.getContext()).inflate(R.layout.delete_account_dialog, viewGroup, false);   //customized
+//                    builder.setView(dialogView);
+                    builder.setMessage("Are you sure?").setTitle("Delete Account");
+                    builder
+                            .setPositiveButton("Yes", (dialogInterface, i1) -> {
 
-                    if (!imageName.equals("")) {
-                        FirebaseStorage.getInstance().getReference().child("images").child(imageName).delete()
-                                .addOnSuccessListener(aVoid -> System.out.println("Image deleted"))
-                                .addOnFailureListener(e -> System.out.println(e.getMessage()));
-                    }
+                                progressBarActivity.setVisibility(View.VISIBLE);
+                                context.getSharedPreferences("com.example.whatsappclone", Context.MODE_PRIVATE).edit().clear().apply();
+                                deleteAtPath("/message/" + uid);
+                                deleteAtPath("/users/" + uid);
+                                deleteAtPath("/messageNotification/" + uid);
 
-                    addMessage(uid).addOnCompleteListener(task -> {
-                        if (!task.isSuccessful()) {
-                            Exception e = task.getException();
-                            if (e instanceof FirebaseFunctionsException) {
-                                FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
-                                FirebaseFunctionsException.Code code = ffe.getCode();
-                                Object details = ffe.getDetails();
+                                if (!imageName.equals("")) {
+                                    FirebaseStorage.getInstance().getReference().child("images").child(imageName).delete()
+                                            .addOnSuccessListener(aVoid -> System.out.println("Image deleted"))
+                                            .addOnFailureListener(e -> System.out.println(e.getMessage()));
+                                }
 
-
-                            }
-
-                        } else {
-                            FirebaseAuth.getInstance().signOut();
-                            progressBarActivity.setVisibility(View.GONE);
-                            Toast.makeText(context, "Account successfully deleted", Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(context.getApplicationContext(), MainActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            context.startActivity(intent);
-                        }
+                                addMessage(uid).addOnCompleteListener(task -> {
+                                    if (!task.isSuccessful()) {
+                                        Exception e = task.getException();
+                                        if (e instanceof FirebaseFunctionsException) {
+                                            FirebaseFunctionsException ffe = (FirebaseFunctionsException) e;
+                                            FirebaseFunctionsException.Code code = ffe.getCode();
+                                            Object details = ffe.getDetails();
 
 
-                    });
+                                        }
+
+                                    } else {
+                                        FirebaseAuth.getInstance().signOut();
+                                        progressBarActivity.setVisibility(View.GONE);
+                                        Toast.makeText(context, "Account successfully deleted", Toast.LENGTH_LONG).show();
+                                        Intent intent = new Intent(context.getApplicationContext(), MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        context.startActivity(intent);
+                                    }
+
+
+                                });
+
+                            })
+                            .setNegativeButton("Cancel", (dialogInterface, i1) -> dialogInterface.cancel());
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+
 
                 }
 

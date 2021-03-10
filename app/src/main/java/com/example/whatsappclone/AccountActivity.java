@@ -35,8 +35,9 @@ ProgressBar progressBarActivity;
         imageName = sharedPreferences.getString("imageName", "");
         System.out.println("SHARED PREF"+imageName);
         accountListData.add(new AccountListData("Delete my account", R.drawable.ic_baseline_delete_24));
+        accountListData.add(new AccountListData("Privacy Policy", R.drawable.ic_baseline_lock_24));
         progressBarActivity.setVisibility(View.GONE);
-        AccountListAdapter accountListAdapter = new AccountListAdapter(getApplicationContext(), accountListData, accountListView,progressBarActivity);
+        AccountListAdapter accountListAdapter = new AccountListAdapter(this, accountListData, accountListView,progressBarActivity);
         accountListView.setAdapter(accountListAdapter);
 
 
