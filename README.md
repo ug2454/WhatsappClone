@@ -23,6 +23,10 @@ A chat app where you can signup and send messages to your friends and also updat
 - Custom List View to show chat messages.
 - Floating Action Button to add friend.
 - Page refresh button to refresh Page.
+- Firebase functions to delete user data
+- Firebase Storage for storing images
+- Firebase Messaging for push notifications
+- End to End message encryption
 
 
 ---
@@ -36,3 +40,6 @@ A chat app where you can signup and send messages to your friends and also updat
 - Functionality to add friends by clicking the Floating Action Button
 - Beautiful Material UI
 - Refresh page to see updated friend list and their avatars.
+- Push notifications when someone sends you a message
+- Delete account details
+- End to End message encryption
