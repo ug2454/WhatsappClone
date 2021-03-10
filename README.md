@@ -7,15 +7,15 @@ A chat app where you can signup and send messages to your friends and also updat
 
 ![Finished App](https://cdn.discordapp.com/attachments/283947045163630593/816209300233256990/20210302_125351.gif)
 
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/819113705358622760/Screenshot_20210310-120043.jpg)
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/819113705161752606/Screenshot_20210310-131009.jpg)
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/819113704930279434/Screenshot_20210309-172636.jpg)
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/818443062501834762/Screenshot_20210308-161828.jpg)
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/818443062283468830/Screenshot_20210308-161820__01.jpg)
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/818443061926559765/Screenshot_20210308-161836.jpg)
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/816201525197668412/Screenshot_20210302-122312.jpg)
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/814192943317254194/Screenshot_20210224-192801.jpg)
-![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/814192942871871508/Screenshot_20210224-192709.jpg)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/819113705358622760/Screenshot_20210310-120043.jpg?width=297&height=660)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/819113705161752606/Screenshot_20210310-131009.jpg?width=297&height=660)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/819113704930279434/Screenshot_20210309-172636.jpg?width=297&height=660)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/818443062501834762/Screenshot_20210308-161828.jpg?width=297&height=660)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/818443062283468830/Screenshot_20210308-161820__01.jpg?width=297&height=660)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/818443061926559765/Screenshot_20210308-161836.jpg?width=297&height=660)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/816201525197668412/Screenshot_20210302-122312.jpg?width=297&height=660)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/814192943317254194/Screenshot_20210224-192801.jpg?width=297&height=660)
+![App Screenshot](https://cdn.discordapp.com/attachments/283947045163630593/814192942871871508/Screenshot_20210224-192709.jpg?width=297&height=660)
 
 
 ---
