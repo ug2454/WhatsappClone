@@ -5,15 +5,15 @@ public class MyListData {
     private String userName;
     private String uid;
     private String imageUrl;
-//    private String lastMessage;
+    private String lastMessage;
 
 
-    public MyListData(String userName, String uid, String imageUrl) {
+    public MyListData(String userName, String uid, String imageUrl,String lastMessage) {
         this.userName = userName;
         this.uid = uid;
         this.imageUrl = imageUrl;
 
-//        this.lastMessage = lastMessage;
+        this.lastMessage = lastMessage;
     }
 
     public String getUserName() {
@@ -41,11 +41,11 @@ public class MyListData {
         this.imageUrl = imageUrl;
     }
 
-//    public String getLastMessage() {
-//        return lastMessage;
-//    }
-//
-//    public void setLastMessage(String lastMessage) {
-//        this.lastMessage = lastMessage;
-//    }
+    public String getLastMessage() {
+        return lastMessage;
+    }
+
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
+    }
 }

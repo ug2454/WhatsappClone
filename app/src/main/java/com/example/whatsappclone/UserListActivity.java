@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -22,11 +23,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.whatsappclone.adapters.AccountListAdapter;
 import com.example.whatsappclone.adapters.MyListAdapter;
 import com.example.whatsappclone.models.MyListData;
+import com.example.whatsappclone.utils.AESUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -39,8 +43,12 @@ public class UserListActivity extends AppCompatActivity {
     static ArrayList<MyListData> userArrayList = new ArrayList<>();
     String uid = "";
     String uniqueid = "";
+    String lastMessage = "";
+    String decrypted = "";
     ProgressBar progressBarUserList;
     ArrayList<String> friendsList = new ArrayList<>();
+    ArrayList<String> friendId = new ArrayList<>();
+    ListView userListView;
     FloatingActionButton addNewFriendFloatingActionButton;
     private static final String TAG = UserListActivity.class.getSimpleName();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -90,6 +98,7 @@ public class UserListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
+        userListView = findViewById(R.id.userListView);
         progressBarUserList = findViewById(R.id.progressBarUserList);
         progressBarUserList.setVisibility(View.VISIBLE);
         uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
@@ -123,40 +132,73 @@ public class UserListActivity extends AppCompatActivity {
         });
 
         userArrayList.clear();
-        db.collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("userFriends")
+        friendsList.clear();
+        friendId.clear();
+
+
+
+
+        db.collection("users").document(uid).collection("userFriends")
 
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             friendsList.add(document.getString("uniqueID"));
+                            friendId.add(document.getString("uid"));
                             Log.d(TAG, document.getId() + " => " + document.getData());
 
 
                         }
                         if (friendsList.size() != 0) {
                             for (int i = 0; i < friendsList.size(); i++) {
-                                db.collection("users").whereEqualTo("uniqueID", friendsList.get(i)).orderBy("nickname").get().addOnSuccessListener(queryDocumentSnapshots -> {
+
+//                                db.collection("message").document(uid).collection(friendId.get(i)).orderBy("messageCount", Query.Direction.DESCENDING).limit(1).get().addOnCompleteListener(task1 -> {
+//                                    for (QueryDocumentSnapshot doc : task1.getResult()) {
+//                                        lastMessage = doc.getString("message");
+//
+//                                        try {
+//                                            decrypted = AESUtils.decrypt(lastMessage);
+//
+//                                        } catch (Exception e1) {
+//                                            e1.printStackTrace();
+//                                        }
+//
+//                                        System.out.println("LAST" + decrypted);
+//                                    }
+//
+//                                });
+//                                int finalI = i;
+                                db.collection("users").whereEqualTo("uniqueID", friendsList.get(i)).get().addOnSuccessListener(queryDocumentSnapshots -> {
                                     for (QueryDocumentSnapshot document1 : queryDocumentSnapshots) {
 
+//
+//                                        System.out.println("LAST"+lastMessage);
                                         userArrayList.add(new MyListData(
                                                 document1.getString("nickname"),
                                                 document1.getString("uid"),
-                                                document1.getString("imageUrl")
-//                                    document.getString("lastMessage")
+                                                document1.getString("imageUrl"),
+                                                ""
+//                                                        doc.getString("message")
                                         ));
+//
+
+
                                     }
 
 
-                                    RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
-                                    MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
-//
-                                    recyclerView.setHasFixedSize(true);
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                                    recyclerView.setAdapter(myListAdapter);
+                                    MyListAdapter myListAdapter = new MyListAdapter(this, userArrayList, userListView);
+                                    userListView.setAdapter(myListAdapter);
 
                                 }).addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
                             }
+
+//                            RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
+//                            MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
+////
+//                            recyclerView.setHasFixedSize(true);
+//                            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+//                            recyclerView.setAdapter(myListAdapter);
                         }
                         progressBarUserList.setVisibility(View.GONE);
 
@@ -188,8 +230,8 @@ public class UserListActivity extends AppCompatActivity {
                                 userArrayList.add(new MyListData(
                                         document.getString("nickname"),
                                         document.getString("uid"),
-                                        document.getString("imageUrl")
-//                                    document.getString("lastMessage")
+                                        document.getString("imageUrl"),
+                                        ""
                                 ));
 
                                 /*Add friend data in current users' subcollection*/
@@ -206,19 +248,15 @@ public class UserListActivity extends AppCompatActivity {
                                             }
                                         });
                             }
-
-                            RecyclerView recyclerView = findViewById(R.id.userRecyclerView);
-                            MyListAdapter myListAdapter = new MyListAdapter(userArrayList);
-//
-                            recyclerView.setHasFixedSize(true);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-                            recyclerView.setAdapter(myListAdapter);
+                            MyListAdapter myListAdapter = new MyListAdapter(this, userArrayList, userListView);
+                            userListView.setAdapter(myListAdapter);
+                            //
                         } else {
 
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }).addOnFailureListener(e -> {
-                        System.out.println("FAILURE");
+                System.out.println("FAILURE");
                 Log.d(TAG, "addFriend: FRIEND ID DOES NOT EXIST");
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
             });
