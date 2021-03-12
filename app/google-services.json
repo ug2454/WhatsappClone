@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:513659793334:android:7f3a8a77b3ecf11e2cdb17",
+        "mobilesdk_app_id": "1:513659793334:android:e6dd163d3088116e2cdb17",
         "android_client_info": {
-          "package_name": "com.example.whatsappclone"
+          "package_name": "com.udaygarg.thumbit"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "513659793334-f0pb7k1dr7cb2567j1fgbo9cdkq17gmt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.udaygarg.thumbit",
+            "certificate_hash": "19947e72b34ed4df42b2c2a5f84999958e160e59"
+          }
+        },
         {
           "client_id": "513659793334-su2trp1mjodap44ojr8h9bu33hq18ab1.apps.googleusercontent.com",
           "client_type": 3
