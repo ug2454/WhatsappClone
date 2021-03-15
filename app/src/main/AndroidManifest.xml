@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.whatsappclone">
+    package="com.udaygarg.thumbit">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:allowBackup="true"
@@ -13,17 +14,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatsAppClone">
-        <activity android:name=".AccountActivity" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".ChatActivity">
+        <activity android:name="com.udaygarg.thumbit.AccountActivity" />
+        <activity android:name="com.udaygarg.thumbit.SettingsActivity" />
+        <activity android:name="com.udaygarg.thumbit.ProfileActivity" />
+        <activity android:name="com.udaygarg.thumbit.LoginActivity" />
+        <activity android:name="com.udaygarg.thumbit.ChatActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.whatsappclone.ChatActivity" />
+                android:value="com.udaygarg.thumbit.ChatActivity" />
         </activity>
-        <activity android:name=".UserListActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name="com.udaygarg.thumbit.UserListActivity" />
+        <activity android:name="com.udaygarg.thumbit.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,7 +33,7 @@
         </activity>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/ic_baseline_notifications_active_24" />
+            android:resource="@drawable/ic_baseline_chat_24" />
         <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
              notification message. See README(https://goo.gl/6BKBk7) for more. -->
         <meta-data
@@ -42,7 +43,7 @@
 <!--            android:name="com.google.firebase.messaging.default_notification_channel_id"-->
 <!--            android:value="@string/default_notification_channel_id" />-->
         <service
-            android:name=".service.NotificationService"
+            android:name="com.udaygarg.thumbit.service.NotificationService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

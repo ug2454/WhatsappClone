@@ -4,58 +4,87 @@
     android:id="@+id/linearLayoutUserList"
     android:layout_width="match_parent"
     android:layout_height="90dp"
-    android:background="@drawable/border">
+    android:background="@drawable/border"
+    android:orientation="horizontal">
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="90dp">
 
-    <RelativeLayout
-        android:id="@+id/shape_layout"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="10dp"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/circle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/myCardView"
+        <RelativeLayout
+            android:id="@+id/shape_layout"
             android:layout_width="50dp"
             android:layout_height="50dp"
-
-
-            app:cardCornerRadius="100dp"
-
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/circle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/userImage"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/myCardView"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
 
 
-                android:scaleType="centerCrop"
-                android:src="@drawable/blankimage" />
-        </androidx.cardview.widget.CardView>
-    </RelativeLayout>
+                app:cardCornerRadius="100dp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/userImage"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
 
 
-    <TextView
-        android:id="@+id/textView"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/blankimage" />
+            </androidx.cardview.widget.CardView>
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center">
 
-        android:layout_toEndOf="@id/userImage"
-        android:layout_toRightOf="@id/userImage"
-        android:gravity="center_vertical"
-        android:paddingLeft="20dp"
-        android:paddingBottom="0dp"
-        android:text="@string/textview"
-        android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:paddingBottom="0dp"
+            android:text="@string/textview"
+            android:textSize="16sp"
+            android:paddingStart="20dp"
+            android:paddingEnd="0dp"
+            android:paddingRight="0dp" />
+
+        <TextView
+            android:id="@+id/lastMessageTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="#CACACA"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:paddingBottom="0dp"
+            android:paddingEnd="0dp"
+            android:text="@string/textview"
+            android:textSize="16sp"
+            android:paddingStart="20dp"
+            android:paddingRight="0dp" />
+    </LinearLayout>
+
 
     <!--    <TextView-->
     <!--        android:id="@+id/lastMessageTextView"-->

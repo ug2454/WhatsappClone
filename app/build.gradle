@@ -8,11 +8,11 @@ android {
     buildToolsVersion "30.0.0"
 
     defaultConfig {
-        applicationId "com.example.whatsappclone"
+        applicationId "com.udaygarg.thumbit"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.2"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -56,6 +56,7 @@ dependencies {
     implementation 'com.wang.avi:library:2.1.3'
     implementation 'com.google.firebase:firebase-functions'
     implementation 'com.google.firebase:firebase-messaging'
+
 
 
 
